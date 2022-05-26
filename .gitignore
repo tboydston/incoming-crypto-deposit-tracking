@@ -2,3 +2,4 @@ data/*
 keys/*
 logs/*
 node_modules
+config.js

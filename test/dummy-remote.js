@@ -2,7 +2,7 @@ const fs = require('fs')
 const express = require('express')
 const http = require('http')
 const bodyParser = require('body-parser')
-const sigMan = require("./lib/signatureManager")
+const sigMan = require("../lib/signatureManager")
 const pubKey = fs.readFileSync(`./keys/pub.pem`)
 
 
