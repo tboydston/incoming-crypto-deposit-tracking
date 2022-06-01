@@ -12,8 +12,9 @@ config = {
         remotePort:"7000",
         remoteRouteAddresses:"addresses/",
         remoteRouteDeposits:"deposits/",
-        tgToken:"",
-        tgChatId:""
+        tgToken:"", // Telegram bot token. 
+        tgChatId:"", // Telegram chat room ID. See: https://stackoverflow.com/questions/32423837/telegram-bot-how-to-get-a-group-chat-id
+        monitor:true 
     }
 }
 

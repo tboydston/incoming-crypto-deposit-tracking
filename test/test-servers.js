@@ -1,7 +1,7 @@
 
 const fs = require('fs')
-const RequestManager = require('./lib/RequestManager')
-const allConfigs = require('./config')
+const RequestManager = require('../lib/RequestManager')
+const allConfigs = require('../config')
 const coin = process.argv[2]
 const config = allConfigs[coin]
 
