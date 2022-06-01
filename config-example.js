@@ -11,7 +11,9 @@ config = {
         remoteAddress:"http://localhost", // "remote" refers to api called to deliver addresses and deposit information.
         remotePort:"7000",
         remoteRouteAddresses:"addresses/",
-        remoteRouteDeposits:"deposits/"
+        remoteRouteDeposits:"deposits/",
+        tgToken:"",
+        tgChatId:""
     }
 }
 

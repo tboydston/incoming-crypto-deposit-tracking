@@ -2,13 +2,16 @@
   "name": "simplecryptodeposittracking",
   "version": "0.0.1",
   "description": "Simple address generation and deposit tracking solution for Bitcoin and Bitcoin like coins.",
-  "main": "addresses.js",
+  "main": "scripts/watchDeposits.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "btc",
-    "depoists"
+    "crypto",
+    "crypto deposits",
+    "watch wallets",
+    "wallet"
   ],
   "author": "Tracey Boydston",
   "license": "MIT",
@@ -17,6 +20,7 @@
     "coinnetworklist": "^1.0.0",
     "crypto": "^1.0.1",
     "express": "^4.18.1",
-    "hdaddressgenerator": "^1.0.7"
+    "hdaddressgenerator": "^1.0.7",
+    "slimbot": "^5.1.0"
   }
 }
