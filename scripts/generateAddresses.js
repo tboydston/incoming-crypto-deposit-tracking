@@ -48,8 +48,8 @@ const config = allConfigs[coin]
     try {
 
         config.keys = {}
-        config.keys.pub = fs.readFileSync(`./keys/${config.pubKey}`)
-        config.keys.priv = fs.readFileSync(`./keys/${config.privKey}`)
+        config.keys.pub = fs.readFileSync(`../keys/${config.pubKey}`)
+        config.keys.priv = fs.readFileSync(`../keys/${config.privKey}`)
 
     } catch (e){
         lm.log(`Error loading signing keys. Raw Error: ${e.message}`)
