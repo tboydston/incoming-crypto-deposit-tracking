@@ -48,13 +48,17 @@ const config = allConfigs[coin]
     let remoteResponse = {}
      
     try {
-        remoteResponse = await requestManager.post("test",{msg:"ping"})    
+        remoteResponse = await requestManager.post(config.remoteRouteAddresses,{msg:"ping"})    
     } catch(e) {
         console.error(`Remote server error. Raw Error: ${e.message}`)
     }
 
-    console.log(rpcResponse.data,remoteResponse.data)
-    
-    
+    console.log(
+        'RPC Response',
+        rpcResponse.data,
+        'Remote Platform Response',
+        remoteResponse.data
+    )
+
 })();
 
