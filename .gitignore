@@ -1,7 +1,8 @@
-data/*
-keys/*
-logs/generateAddresses/*
-logs/watchDeposits/*
-logs/monitorChains/*
+data/**
+keys/**
+logs/**
+
 node_modules
 config.js
+
+!.gitkeep
