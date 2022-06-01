@@ -19,6 +19,7 @@ const config = allConfigs[coin]
  */
 ;(async()=>{
 
+    // Load log manager. 
     try {
         lm = new LogManager(
             'generateAddresses',
@@ -31,16 +32,19 @@ const config = allConfigs[coin]
         return
     }
 
+    // Validate submitted mode. 
     if( !validModes.includes(mode) ){
         lm.log(`Invalid mode entered: ${process.argv[3]} Valid modes: ${validModes.join(', ')}`)
         return
     }
 
+    // Validate submitted number. 
     if( isNaN(numberToGenerate) ){
         lm.log(`Number of addresses to generate must be a number. You submitted: ${process.argv[2]}`)
         return
     }
 
+    // Load keys used for signing requests to remote server.
     try {
 
         config.keys = {}
@@ -52,6 +56,7 @@ const config = allConfigs[coin]
         return
     }
 
+    // Initiate RequestManager class used for making RPC and signed platform API requests. 
     let requestManager = {}
 
     try {
