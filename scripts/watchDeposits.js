@@ -13,7 +13,7 @@ const config = allConfigs[coin]
     // Load log manager. 
     try {
         lm = new LogManager(
-            'deposits',
+            'watchDeposits',
             coin,
             config.tgToken,
             config.tgChatId,
