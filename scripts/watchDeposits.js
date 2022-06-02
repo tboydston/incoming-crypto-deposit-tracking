@@ -28,8 +28,8 @@ const config = allConfigs[coin]
     try {
 
         config.keys = {}
-        config.keys.pub = fs.readFileSync(`../keys/${config.pubKey}`)
-        config.keys.priv = fs.readFileSync(`../keys/${config.privKey}`)
+        config.keys.pub = fs.readFileSync(`${__dirname}/../keys/${config.pubKey}`)
+        config.keys.priv = fs.readFileSync(`${__dirname}/../keys/${config.privKey}`)
 
     } catch (e){
         lm.log(`Error loading signing keys. Raw Error: ${e.message}`,true,true)
@@ -39,8 +39,8 @@ const config = allConfigs[coin]
     // Check to see if lastDepositBlock file exists for coin if not create it at 0.
     try {
 
-        if ( !fs.existsSync(`../data/lastDepositBlock-${coin}.txt`) ) {
-            fs.writeFileSync(`../data/lastDepositBlock-${coin}.txt`, "0");
+        if ( !fs.existsSync(`${__dirname}/../data/lastDepositBlock-${coin}.txt`) ) {
+            fs.writeFileSync(`${__dirname}/../data/lastDepositBlock-${coin}.txt`, "0");
         }
 
     } catch (e) {
@@ -53,7 +53,7 @@ const config = allConfigs[coin]
     // Read file containing last block to determine which block we should look for new deposits from. 
     try {
 
-        data.lastDepositBlock = fs.readFileSync(`../data/lastDepositBlock-${coin}.txt`).toString()
+        data.lastDepositBlock = fs.readFileSync(`${__dirname}/../data/lastDepositBlock-${coin}.txt`).toString()
 
     } catch (e){
         lm.log(`Error loading last block. Raw Error: ${e.message}`,true,true)
@@ -178,7 +178,7 @@ const config = allConfigs[coin]
 
     // Update last block number in file. 
     try {
-        fs.writeFileSync(`../data/lastDepositBlock-${coin}.txt`, heighestBlock.toString());
+        fs.writeFileSync(`${__dirname}/../data/lastDepositBlock-${coin}.txt`, heighestBlock.toString());
     } catch (e) {
         lm.log(`Error writing last deposit block. Check to make sure disk is not full. Raw Error: ${e.message}`,true,true)
         return

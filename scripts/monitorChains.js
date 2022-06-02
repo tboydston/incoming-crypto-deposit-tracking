@@ -38,8 +38,8 @@ const config = allConfigs[coin]
         // Check to see if lastBlock file exists for coin if not create it at 0.
         try {
 
-            if ( !fs.existsSync(`../data/lastBlock-${coin}.txt`) ) {
-                fs.writeFileSync(`../data/lastBlock-${coin}.txt`, "0");
+            if ( !fs.existsSync(`${__dirname}/../data/lastBlock-${coin}.txt`) ) {
+                fs.writeFileSync(`${__dirname}/../data/lastBlock-${coin}.txt`, "0");
             }
 
         } catch (e) {
@@ -52,7 +52,7 @@ const config = allConfigs[coin]
         // Read file containing last block to determine which block we should look for new deposits from. 
         try {
 
-            let lastBlockResult = fs.readFileSync(`../data/lastBlock-${coin}.txt`).toString().split(":")
+            let lastBlockResult = fs.readFileSync(`${__dirname}/../data/lastBlock-${coin}.txt`).toString().split(":")
             data.lastBlock = lastBlockResult[0]
             data.lastBlockScanTime = lastBlockResult[1]
 
@@ -106,7 +106,7 @@ const config = allConfigs[coin]
 
         // There has been a new block so we update the block number and time to the data file. 
         try {
-            fs.writeFileSync(`../data/lastBlock-${coin}.txt`, `${newHighestBlock.toString()}:${now}`);
+            fs.writeFileSync(`${__dirname}/../data/lastBlock-${coin}.txt`, `${newHighestBlock.toString()}:${now}`);
         } catch (e) {
             lm.log(`Error writing last block. Check to make sure disk is not full. Raw Error: ${e.message}`,true,true)
             continue

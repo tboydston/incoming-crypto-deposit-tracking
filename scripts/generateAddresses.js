@@ -48,8 +48,8 @@ const config = allConfigs[coin]
     try {
 
         config.keys = {}
-        config.keys.pub = fs.readFileSync(`../keys/${config.pubKey}`)
-        config.keys.priv = fs.readFileSync(`../keys/${config.privKey}`)
+        config.keys.pub = fs.readFileSync(`${__dirname}/../keys/${config.pubKey}`)
+        config.keys.priv = fs.readFileSync(`${__dirname}/../keys/${config.privKey}`)
 
     } catch (e){
         lm.log(`Error loading signing keys. Raw Error: ${e.message}`)
@@ -126,7 +126,7 @@ const config = allConfigs[coin]
 
     if( ['remoteOnly','add'].includes(mode) ){
         try {
-            remoteResponse = await requestManager.post(config.remoteRoute,remoteFormatted)
+            remoteResponse = await requestManager.post(config.remoteRouteAddresses,remoteFormatted)
         } catch(e) {
             lm.log(`Remote server error. Raw Error: ${e.message}`)
         }
