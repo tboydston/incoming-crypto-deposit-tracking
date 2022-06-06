@@ -10,6 +10,10 @@ const config = allConfigs[coin]
 
 ;(async()=>{
 
+    if ( coin === undefined ){
+        console.log('Coin must be defined. Exampled: node watchDeposits.js BTC')
+    }
+
     // Load log manager. 
     try {
         lm = new LogManager(

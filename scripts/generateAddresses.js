@@ -1,5 +1,6 @@
 
 const fs = require('fs')
+const crypto = require('crypto')
 const HdAddGen = require('hdaddressgenerator')
 const RequestManager = require('../lib/RequestManager')
 
@@ -18,6 +19,10 @@ const config = allConfigs[coin]
  * Generate deterministic addresses and add them to a local Bitcoind like wallet and remote platform API.
  */
 ;(async()=>{
+
+    if ( coin === undefined ){
+        console.log('Coin must be defined. Exampled: node watchDeposits.js BTC')
+    }
 
     // Load log manager. 
     try {
@@ -91,12 +96,15 @@ const config = allConfigs[coin]
     }
 
     let rpcFormatted = []
+    let pubKeyHash = crypto.createHash('sha256').update(config.xpub).digest('base64')
 
     addresses.forEach(address => {
         
         lm.log(`${address.path},${address.address},${address.pubKey}`,true,false)
 
         remoteFormatted.addresses.push({
+            xPubHash:pubKeyHash,
+            index:address.index,
             path:address.path,
             address:address.address,
             pubKey:address.pubKey
