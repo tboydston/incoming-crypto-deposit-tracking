@@ -8,10 +8,16 @@ const allConfigs = require('../config');
 const coin = process.argv[2]
 const config = allConfigs[coin]
 
+let method = process.argv[3]
+
 ;(async()=>{
 
     if ( coin === undefined ){
-        console.log('Coin must be defined. Exampled: node watchDeposits.js BTC')
+        console.log('Coin must be defined. Example: node watchDeposits.js BTC')
+    }
+
+    if ( method === undefined) {
+        method = 'notifyAll'
     }
 
     // Load log manager. 
@@ -149,9 +155,11 @@ const config = allConfigs[coin]
 
         // Check to see if we should send a notification about this transaction.
         if ( 
-            ( tx.confirmations === 0 && config.notifyUnconfirmed ) ||
-            ( tx.confirmations === 1 && config.notifyConfirmed ) ||
-            ( tx.confirmations === config.notifyWhen )
+            ( method === 'walletNotify' && 
+            ( ( tx.confirmations === 0 && config.notifyUnconfirmed ) ||
+            ( tx.confirmations === 1 && config.notifyConfirmed ) ) ) || 
+            tx.confirmations === config.notifyWhen || 
+            method === 'notifyAll'
         ){
             depositString += 
             `Deposit ${txData.length}
@@ -174,8 +182,7 @@ const config = allConfigs[coin]
     });
 
     if ( txData.length > 0 && depositString.length !== 0 ){
-        lm.log(`Incoming Deposit(s): \n${depositString}`,true,true)
-        
+        lm.log(`Incoming Deposit(s): \n${depositString}`,true,true)   
     }
 
     // Send deposit info to platform.
@@ -184,6 +191,7 @@ const config = allConfigs[coin]
             coin,
             txData,
         })
+        lm.log(`Notified platform of deposit. Deposit: ${JSON.stringify(txData)}`,true,false)
     } catch(e) {
         lm.log(`Error sending deposits to platform. Confirm platform API is operating. Raw Error: ${e.message}`,true,true)
         return
@@ -195,6 +203,7 @@ const config = allConfigs[coin]
     // Update last block number in file. 
     try {
         fs.writeFileSync(`${__dirname}/../data/lastDepositBlock-${coin}.txt`, heighestBlock.toString());
+        lm.log(`Last deposit block updated to ${heighestBlock.toString()}`,true,false)
     } catch (e) {
         lm.log(`Error writing last deposit block. Check to make sure disk is not full. Raw Error: ${e.message}`,true,true)
         return
