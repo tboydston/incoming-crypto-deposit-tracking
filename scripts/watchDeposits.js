@@ -81,7 +81,7 @@ const config = allConfigs[coin]
         return
     }
 
-    // Convert the last block number to a block hash which is required by the lastsinceblock RPC function.
+    // Convert the last deposit block number to a block hash which is required by the lastsinceblock RPC function.
     let hashResponse = {}
 
     try{
@@ -143,21 +143,33 @@ const config = allConfigs[coin]
             txid: tx.txid
         })
 
-        depositString += 
-        `Deposit ${txData.length}
-        Address: ${tx.address}
-        Amount: ${tx.amount}
-        Confirmations: ${tx.confirmations}
-        Block: ${tx.blockheight}
-        TxId: ${tx.txid}\n`
+        // Check to see if we should send a notification about this transaction.
+        if ( 
+            ( tx.confirmations === 0 && config.notifyUnconfirmed ) ||
+            ( tx.confirmations === 1 && config.notifyConfirmed ) ||
+            ( tx.confirmations === config.notifyWhen )
+        ){
+            depositString += 
+            `Deposit ${txData.length}
+            Address: ${tx.address}
+            Amount: ${tx.amount}
+            Confirmations: ${tx.confirmations}
+            Block: ${tx.blockheight}
+            TxId: ${tx.txid}\n`
+        }
 
-        if ( tx.blockheight != undefined && tx.blockheight > heighestBlock ) {
+        // Find the highest block to track deposits from.
+        if ( 
+            tx.blockheight != undefined && 
+            tx.blockheight > heighestBlock && 
+            tx.confirmations > config.watchConfirmations
+        ) {
             heighestBlock = tx.blockheight
         }
 
     });
 
-    if ( txData.length > 0 ){
+    if ( txData.length > 0 && depositString.length !== 0 ){
         lm.log(`Incoming Deposit(s): \n${depositString}`,true,true)
         
     }

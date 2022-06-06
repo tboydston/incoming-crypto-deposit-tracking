@@ -14,7 +14,10 @@ config = {
         remoteRouteDeposits:"deposits/",
         tgToken:"", // Telegram bot token. 
         tgChatId:"", // Telegram chat room ID. See: https://stackoverflow.com/questions/32423837/telegram-bot-how-to-get-a-group-chat-id
-        monitor:true 
+        monitor:true,
+        notifyUnconfirmed:true, // Notify when there is a deposit that is not yet confirmed. 
+        notifyConfirmed:true, // Notify when a tx is confirmed. 
+        notifyWhen:0 // Not when a certain number of confirmations is reached. Can't be greater than watchConfirmations.  
     }
 }
 

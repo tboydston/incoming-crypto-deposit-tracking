@@ -3,7 +3,7 @@ const express = require('express')
 const http = require('http')
 const bodyParser = require('body-parser')
 const sigMan = require("../lib/signatureManager")
-const pubKey = fs.readFileSync(`./keys/pub.pem`)
+const pubKey = fs.readFileSync(`../keys/pub.pem`)
 
 
 var app = express();
@@ -30,9 +30,9 @@ app.post('/*', async(req, res) => {
       received:req.body,
       sigValid: await sigMan.verify(pubKey,req.body,req.headers.signature)
   }
-
+  console.log(response)
   res.send(response)
 
 });
 
-http.createServer(app).listen(7000);
+http.createServer(app).listen(7001);

@@ -6,3 +6,5 @@ node_modules
 config.js
 
 !.gitkeep
+
+test-sig.js
