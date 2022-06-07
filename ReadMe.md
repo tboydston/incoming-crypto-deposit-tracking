@@ -1,4 +1,4 @@
-# Simple Crypto Deposit Tracking
+# Simple Crypto Deposit Tracking ( SCDT )
 
 ## Overview
 
@@ -57,7 +57,7 @@ config = {
         monitor:true,
         notifyUnconfirmed:true, // Notify when there is a deposit that is not yet confirmed. 
         notifyConfirmed:true, // Notify when a tx is confirmed. 
-        notifyWhen:0 // Not when a certain number of confirmations is reached. Can't be greater than watchConfirmations.  
+        notifyWhen:0 // Notify when a certain number of confirmations is reached. Can't be greater than watchConfirmations and won't notify unless it is greater than 1.  
     }
 }
 
@@ -65,10 +65,13 @@ config = {
 
 ## Getting your Bitcoind RPC credentials
 
-
 Bitcoind RPC credentials can be set in the bitcoin.conf file. 
 
 Instructions on how to find the .conf file can be found [here](https://github.com/bitcoin/bitcoin/blob/master/doc/bitcoin-conf.md#default-configuration-file-locations)
+
+Currently `rpcuser` and `rpcpassword` are used for authentication. As authentication via username and password will soon be deprecated future version will switch to cookie based authentication. 
+
+This guide assumes that you are running SCDT on the same server as Bitcoind. If you are not you can consider mapping the RPC port from the server where Bitcoind is hosted to the server where SCDT is hosted. Instruction on how to do this can be found [here](https://linuxize.com/post/how-to-setup-ssh-tunneling/#:~:text=For%20remote%20port%20forwarding%2C%20enter,in%20the%20Source%20Port%20field.). 
 
 ### WARNING 
 
@@ -91,4 +94,34 @@ Ledger: See [Here](https://support.ledger.com/hc/en-us/articles/360011069619-Ext
 ### WARNING 
 
 While funds cannot be stolen if an attacked possesses only your extended public key it can but used to recreated your address chain. This will reveal all of your deposits addresses and make your wallet trackable. Treat this key as a critical secret. 
+
+## Generating Signing Keys
+
+In the 'scripts' folder is a js file called generateKeyPairs.js. This can be used to generate a public and private key pair. 
+
+``
+node scripts/generateKeyPairs.js
+``
+
+Output will be shown on the console. Copy and paste the private key to file called 'priv.key' in the 'keys' folder. Copy and paste the public key to a file called 'pub.pem' in the keys folder. The public key will be shared with your platform and used to verify the signature of requests to your platform API. 
+
+### WARNING 
+
+Treat the 'priv.key' as a critical secret. If compromised it could be used to send fake deposits notifications to your platform or add addresses to the server that you do not control the private keys to. 
+
+## Additional walletnotify and blocknotify Settings to Bitcoind.conf
+
+Open your bitcoin.conf and add the following settings. 
+
+``
+walletnotify=node /[PATH TO SCDT]/scripts/watchDeposits.js BTC walletNotify
+blocknotify=node /[PATH TO SCDT]/scripts/watchDeposits.js BTC blockNotify
+
+``
+
+Then restart bitcoind. These settings will call the watchDeposit script after each transaction and register incoming deposits. 
+
+### NOTE 
+
+If the watchDeposits script is not being executed correctly confirm that node js is accessible to all users. For linux systems see this [article](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-with-nvm-node-version-manager-on-a-vps).
 

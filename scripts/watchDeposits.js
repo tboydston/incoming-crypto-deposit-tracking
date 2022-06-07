@@ -158,7 +158,7 @@ let method = process.argv[3]
             ( method === 'walletNotify' && 
             ( ( tx.confirmations === 0 && config.notifyUnconfirmed ) ||
             ( tx.confirmations === 1 && config.notifyConfirmed ) ) ) || 
-            tx.confirmations === config.notifyWhen || 
+            ( tx.confirmations === config.notifyWhen && tx.confirmations > 1 ) || 
             method === 'notifyAll'
         ){
             depositString += 
@@ -174,7 +174,7 @@ let method = process.argv[3]
         if ( 
             tx.blockheight != undefined && 
             tx.blockheight > heighestBlock && 
-            tx.confirmations > config.watchConfirmations
+            tx.confirmations >= config.watchConfirmations
         ) {
             heighestBlock = tx.blockheight
         }
