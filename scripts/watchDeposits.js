@@ -163,11 +163,11 @@ let method = process.argv[3]
         ){
             depositString += 
             `Deposit ${txData.length}
-            Address: ${tx.address}
+            Address: [${tx.address}](${config.explorerAddressUrl}/${tx.address})
             Amount: ${tx.amount}
             Confirmations: ${tx.confirmations}
-            Block: ${tx.blockheight}
-            TxId: ${tx.txid}\n`
+            Block: [${tx.blockheight}](${config.explorerBlockUrl}/${tx.blockheight})
+            TxId: [${tx.txid}](${config.explorerTxUrl}/${tx.txid})\n`
         }
 
         // Find the highest block to track deposits from.

@@ -97,16 +97,25 @@ const config = allConfigs[coin]
 
         const newHighestBlock = hashResponse.data.result
         const checkDurationMin = ( ( now - data.lastBlockScanTime ) / 60 ).toFixed(0)
+        const warningThreshold = ( config.expectBlockPeriod / 60 ).toFixed(0)
         console.log(newHighestBlock, data.lastBlock)
-        // If the block number has not been changed we log a warning. 
-        if ( newHighestBlock <= data.lastBlock ){
-            lm.log(`${coin} chain has not updated since we checked ${checkDurationMin} minute(s) ago.`,true,true)
+        
+        // If the block number has not been changed within our expected block period we log and send a warning to TG. 
+        if ( newHighestBlock <= data.lastBlock && data.lastBlockScanTime < now - config.expectBlockPeriod ){
+            lm.log(`${coin} chain has not updated in over ${checkDurationMin} minute(s).`,true,true)
+            continue
+        } 
+
+        // If the block number has not been changed but time between blocks is still less than the expected block period we log that we scanned but don't notify TG. 
+        if ( newHighestBlock <= data.lastBlock) {
+            lm.log(`${coin} chain has not updated in over ${checkDurationMin} minute(s). Within warning threshold of ${warningThreshold}. No notification sent.`,true,false)
             continue
         }
 
         // There has been a new block so we update the block number and time to the data file. 
         try {
-            fs.writeFileSync(`${__dirname}/../data/lastBlock-${coin}.txt`, `${newHighestBlock.toString()}:${now}`);
+            fs.writeFileSync(`${__dirname}/../data/lastBlock-${coin}.txt`, `${newHighestBlock.toString()}:${now}`)
+            lm.log(`New ${coin} block: ${newHighestBlock.toString()}`,true,false)
         } catch (e) {
             lm.log(`Error writing last block. Check to make sure disk is not full. Raw Error: ${e.message}`,true,true)
             continue
