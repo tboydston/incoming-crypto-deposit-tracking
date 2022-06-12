@@ -30,7 +30,8 @@ const config = allConfigs[coin]
             'generateAddresses',
             coin,
             config.tgToken,
-            config.tgChatId
+            config.tgChatId,
+            "Generate Addresses"
         )
     } catch (e){
         console.log(`Error loading log manager. Raw Error: ${e.message}`)
@@ -100,7 +101,7 @@ const config = allConfigs[coin]
 
     addresses.forEach(address => {
         
-        lm.log(`${address.path},${address.address},${address.pubKey}`,true,false)
+        lm.log(`${address.path},${address.address},${address.pubKey}`,true,true)
 
         remoteFormatted.addresses.push({
             xPubHash:pubKeyHash,
