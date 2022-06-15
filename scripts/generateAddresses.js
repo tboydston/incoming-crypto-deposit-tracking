@@ -6,7 +6,7 @@ const RequestManager = require('../lib/RequestManager')
 
 const allConfigs = require('../config')
 const LogManager = require('../lib/LogManager')
-const validModes = ['show','walletOnly','remoteOnly','add']
+const validModes = ['show','walletOnly','platformOnly','add']
 
 const coin = process.argv[2]
 const mode = process.argv[3]
@@ -20,7 +20,7 @@ const config = allConfigs[coin]
  */
 ;(async()=>{
 
-    if ( coin === undefined ){
+    if ( config === undefined ){
         console.log('Coin must be defined. Example: node generateAddresses.js BTC show 0 1')
     }
 
@@ -29,8 +29,8 @@ const config = allConfigs[coin]
         lm = new LogManager(
             'generateAddresses',
             coin,
-            config.tgToken,
-            config.tgChatId,
+            config.notifications.telegram.token,
+            config.notifications.telegram.chatId,
             "Generate Addresses"
         )
     } catch (e){
@@ -44,9 +44,9 @@ const config = allConfigs[coin]
         return
     }
 
-    // Validate submitted number. 
-    if( isNaN(numberToGenerate) ){
-        lm.log(`Number of addresses to generate must be a number. You submitted: ${process.argv[2]}`)
+    // Validate index and number to generate.  
+    if( isNaN(startIndex) || isNaN(numberToGenerate) ){
+        lm.log(`Index and number of addresses to generate must be a number. Example: node generateAddresses.js BTC show 0 1`)
         return
     }
 
@@ -54,8 +54,8 @@ const config = allConfigs[coin]
     try {
 
         config.keys = {}
-        config.keys.pub = fs.readFileSync(`${__dirname}/../keys/${config.pubKey}`)
-        config.keys.priv = fs.readFileSync(`${__dirname}/../keys/${config.privKey}`)
+        config.keys.pub = fs.readFileSync(`${__dirname}/../keys/${config.keyFiles.pub}`)
+        config.keys.priv = fs.readFileSync(`${__dirname}/../keys/${config.keyFiles.priv}`)
 
     } catch (e){
         lm.log(`Error loading signing keys. Raw Error: ${e.message}`)
@@ -68,12 +68,12 @@ const config = allConfigs[coin]
     try {
 
         requestManager = new RequestManager(
-            config.remoteAddress,
-            config.remotePort,
-            config.rpcAddress,
-            config.rpcPort,
-            config.rpcUser,
-            config.rpcPass,
+            config.platform.address,
+            config.platform.port,
+            config.rpc.address,
+            config.rpc.port,
+            config.rpc.user,
+            config.rpc.pass,
             config.keys.priv,
             config.keys.pub
         )
@@ -84,9 +84,9 @@ const config = allConfigs[coin]
     }
 
     let addGen = HdAddGen.withExtPub(
-            config.xpub,
+            config.addressGen.xpub,
             coin,
-            bip=parseInt(config.bip)
+            bip=parseInt(config.addressGen.bip)
         )
         
     let addresses = await addGen.generate(parseInt(numberToGenerate),parseInt(startIndex))
@@ -97,20 +97,21 @@ const config = allConfigs[coin]
     }
 
     let rpcFormatted = []
-    let pubKeyHash = crypto.createHash('sha256').update(config.xpub).digest('base64')
+    let pubKeyHash = crypto.createHash('sha256').update(config.addressGen.xpub).digest('hex')
 
+    let index = startIndex
     addresses.forEach(address => {
-        
-        lm.log(`${address.path},${address.address},${address.pubKey}`,true,true)
+
+        lm.log(`${address.path},${address.address},${address.pubKey}`,true,false)
 
         remoteFormatted.addresses.push({
             xPubHash:pubKeyHash,
-            index:address.index,
+            index:index,
             path:address.path,
             address:address.address,
             pubKey:address.pubKey
         })
-        
+
         rpcFormatted.push(
             { "scriptPubKey": 
                 {
@@ -119,6 +120,8 @@ const config = allConfigs[coin]
                 "timestamp":"now"
             }
         )
+        console.log(remoteFormatted)
+        index++
 
     });
 
@@ -133,13 +136,14 @@ const config = allConfigs[coin]
         }        
     }
 
-    if( ['remoteOnly','add'].includes(mode) ){
+    if( ['platformOnly','add'].includes(mode) ){
         try {
-            remoteResponse = await requestManager.post(config.remoteRouteAddresses,remoteFormatted)
+            remoteResponse = await requestManager.post(config.platform.routes.addresses,remoteFormatted)
         } catch(e) {
             lm.log(`Remote server error. Raw Error: ${e.message}`)
         }
     }
+
 
 })();
 

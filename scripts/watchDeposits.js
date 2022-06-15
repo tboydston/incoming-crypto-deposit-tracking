@@ -25,8 +25,8 @@ let method = process.argv[3]
         lm = new LogManager(
             'watchDeposits',
             coin,
-            config.tgToken,
-            config.tgChatId,
+            config.notifications.telegram.token,
+            config.notifications.telegram.chatId,
             "Watch Deposits"
         )
     } catch (e){
@@ -38,8 +38,8 @@ let method = process.argv[3]
     try {
 
         config.keys = {}
-        config.keys.pub = fs.readFileSync(`${__dirname}/../keys/${config.pubKey}`)
-        config.keys.priv = fs.readFileSync(`${__dirname}/../keys/${config.privKey}`)
+        config.keys.pub = fs.readFileSync(`${__dirname}/../keys/${config.keyFiles.pub}`)
+        config.keys.priv = fs.readFileSync(`${__dirname}/../keys/${config.keyFiles.priv}`)
 
     } catch (e){
         lm.log(`Error loading signing keys. Raw Error: ${e.message}`,true,true)
@@ -76,12 +76,12 @@ let method = process.argv[3]
     try {
 
         requestManager = new RequestManager(
-            config.remoteAddress,
-            config.remotePort,
-            config.rpcAddress,
-            config.rpcPort,
-            config.rpcUser,
-            config.rpcPass,
+            config.platform.address,
+            config.platform.port,
+            config.rpc.address,
+            config.rpc.port,
+            config.rpc.user,
+            config.rpc.pass,
             config.keys.priv,
             config.keys.pub
         )
@@ -144,8 +144,11 @@ let method = process.argv[3]
     txs.forEach(tx => {
         
         if ( tx.category !== 'receive' ) return
+
+        let pubKeyHash = crypto.createHash('sha256').update(config.xpub).digest('hex')
        
         txData.push({
+            xPubHash: pubKeyHash,
             address: tx.address,
             amount: tx.amount,
             confirmations: tx.confirmations,
@@ -156,25 +159,25 @@ let method = process.argv[3]
         // Check to see if we should send a notification about this transaction.
         if ( 
             ( method === 'walletNotify' && 
-            ( ( tx.confirmations === 0 && config.notifyUnconfirmed ) ||
-            ( tx.confirmations === 1 && config.notifyConfirmed ) ) ) || 
-            ( tx.confirmations === config.notifyWhen && tx.confirmations > 1 ) || 
+            ( ( tx.confirmations === 0 && config.notifications.unconfirmed ) ||
+            ( tx.confirmations === 1 && config.notifications.confirmed ) ) ) || 
+            ( tx.confirmations === config.notifications.when && tx.confirmations > 1 ) || 
             method === 'notifyAll'
         ){
             depositString += 
             `Deposit ${txData.length}
-            Address: [${tx.address}](${config.explorerAddressUrl}/${tx.address})
+            Address: [${tx.address}](${config.explorer.address}/${tx.address})
             Amount: ${tx.amount}
             Confirmations: ${tx.confirmations}
-            Block: [${tx.blockheight}](${config.explorerBlockUrl}/${tx.blockheight})
-            TxId: [${tx.txid}](${config.explorerTxUrl}/${tx.txid})\n`
+            Block: [${tx.blockheight}](${config.explorer.block}/${tx.blockheight})
+            TxId: [${tx.txid}](${config.explorer.tx}/${tx.txid})\n`
         }
 
         // Find the highest block to track deposits from.
         if ( 
             tx.blockheight != undefined && 
             tx.blockheight > heighestBlock && 
-            tx.confirmations >= config.watchConfirmations
+            tx.confirmations >= config.notifications.watchUntil
         ) {
             heighestBlock = tx.blockheight
         }
@@ -182,12 +185,12 @@ let method = process.argv[3]
     });
 
     if ( txData.length > 0 && depositString.length !== 0 ){
-        lm.log(`Incoming Deposit(s): \n${depositString}`,true,true)   
+        lm.log(`Incoming ${coin} Deposit(s): \n${depositString}`,true,true)   
     }
 
     // Send deposit info to platform.
     try {
-        remoteResponse = await requestManager.post(config.remoteRouteDeposits,{
+        remoteResponse = await requestManager.post(config.platform.routes.deposits,{
             coin,
             txData,
         })
