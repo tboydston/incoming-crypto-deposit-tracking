@@ -1,5 +1,6 @@
 
 const fs = require('fs')
+const crypto = require('crypto')
 const RequestManager = require('../lib/RequestManager')
 const LogManager = require('../lib/LogManager')
 
@@ -122,8 +123,6 @@ let method = process.argv[3]
         return 
     }
 
-    //console.log("RPC Result:",txResponse.data.result.transactions)
-
     if ( txResponse.data.result.transactions == undefined ) {
         lm.log(`RPC listsinceblock malformed. Raw Response: ${JSON.stringify(txResponse.data)}`,true,true)
         return 
@@ -139,14 +138,13 @@ let method = process.argv[3]
     let txData = []
     let depositString = ""
     let heighestBlock = 0
+    let pubKeyHash = crypto.createHash('sha256').update(config.addressGen.xpub).digest('hex')
 
     // Format transactions for platform. 
     txs.forEach(tx => {
         
         if ( tx.category !== 'receive' ) return
 
-        let pubKeyHash = crypto.createHash('sha256').update(config.xpub).digest('hex')
-       
         txData.push({
             xPubHash: pubKeyHash,
             address: tx.address,
@@ -166,11 +164,11 @@ let method = process.argv[3]
         ){
             depositString += 
             `Deposit ${txData.length}
-            Address: [${tx.address}](${config.explorer.address}/${tx.address})
+            Address: [${tx.address}](${config.explorer.address}${tx.address})
             Amount: ${tx.amount}
             Confirmations: ${tx.confirmations}
-            Block: [${tx.blockheight}](${config.explorer.block}/${tx.blockheight})
-            TxId: [${tx.txid}](${config.explorer.tx}/${tx.txid})\n`
+            Block: [${tx.blockheight}](${config.explorer.block}${tx.blockheight})
+            TxId: [${tx.txid}](${config.explorer.tx}${tx.txid})\n`
         }
 
         // Find the highest block to track deposits from.
@@ -185,7 +183,7 @@ let method = process.argv[3]
     });
 
     if ( txData.length > 0 && depositString.length !== 0 ){
-        lm.log(`Incoming ${coin} Deposit(s): \n${depositString}`,true,true)   
+        lm.log(`Incoming ${coin} Deposit\\(s\\): \n${depositString}`,true,true)   
     }
 
     // Send deposit info to platform.

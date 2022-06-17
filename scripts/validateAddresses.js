@@ -1,4 +1,3 @@
-
 const fs = require('fs')
 const crypto = require('crypto')
 const HdAddGen = require('hdaddressgenerator')
@@ -17,7 +16,7 @@ const config = allConfigs[coin]
 const validationTypes = ['hash','address']
 
 /**
- * Compares HASH of remote addresses with generated addresses to make sure they have not been tampered with.
+ * Compares platform addresses with generated addresses to make sure they have not been tampered with.
  */
 ;(async()=>{
 
@@ -32,7 +31,7 @@ const validationTypes = ['hash','address']
             coin,
             config.notifications.telegram.token,
             config.notifications.telegram.chatId,
-            "Generate Addresses"
+            "Validate Addresses"
         )
     } catch (e){
         console.log(`Error loading log manager. Raw Error: ${e.message}`)
@@ -50,6 +49,10 @@ const validationTypes = ['hash','address']
         lm.log(`Index and number of addresses to validate must be a number. Example: node validateAddresses.js BTC 0 1`)
         return
     }
+
+    // Convert number in string to integer. 
+    startIndex = parseInt(startIndex)
+    numberToValidate = parseInt(numberToValidate)
 
     // Load keys used for signing requests to remote server.
     try {
@@ -97,8 +100,6 @@ const validationTypes = ['hash','address']
     // Build request to platform for addresses within a certain range associated with a public key. 
     let pubKeyHash = crypto.createHash('sha256').update(config.addressGen.xpub).digest('hex')
 
-    startIndex = parseInt(startIndex)
-    numberToValidate = parseInt(numberToValidate)
     const endIndex = startIndex + numberToValidate
 
 

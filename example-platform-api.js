@@ -19,6 +19,16 @@ if ( config === undefined ){
     console.log('Coin must be defined. Example: node example-platform.js BTC')
 }
 
+// This is expecting a file containing the wallet TX output from the listsinceblock RPC command and is used as example data to test the /validate/deposits route. It is looking for just the "transactions" array from this output. 
+// File content example: 'module.exports = [transactions array]
+let exampleDeposits = []
+try {
+    exampleDeposits = require('./test/exampleDeposits.js')
+} catch (e) {
+    console.log("No example deposit data supplied. Route validate/deposits will not work.",e)
+}
+
+
 ;(async()=>{
 
     const app = express();
@@ -42,12 +52,16 @@ if ( config === undefined ){
 
     })
 
+    // Log incoming request to console.
+    app.use(async (req, res, next) => {
+        console.log(req.originalUrl,req.body)
+        next() 
+    })
+
     // Add addresses. 
     app.post('/addresses', async(req, res) => {
     
         // Here is where you would add the new addresses to your DB. 
-        console.log("New Addresses")
-        console.log(req.body)
 
         res.status(200).send({
             status:'success',
@@ -61,8 +75,6 @@ if ( config === undefined ){
     app.post('/deposits', async(req, res) => {
     
         // Here is where you would add the new deposits to your DB. 
-        console.log("New Deposits")
-        console.log(req.deposits)
 
         res.status(200).send({
             status:'success',
@@ -78,9 +90,7 @@ if ( config === undefined ){
 
         let validRequest = true
         let reqData = {}
-
-        console.log("New Deposit Address Validation Request.")
-       
+ 
         // This is basic validation for this example. In a live environment this should be replaced with something more robust. 
         try{
             reqData = JSON.parse(req.body).data
@@ -167,10 +177,66 @@ if ( config === undefined ){
 
     });
 
+    // Validate Deposits.
+    app.post('/validate/deposits', async(req, res) => {
+
+        let validRequest = true
+        let reqData = {}
+
+        // This is basic validation for this example. In a live environment this should be replaced with something more robust. 
+        try{
+            reqData = JSON.parse(req.body).data
+        } catch (e) {
+            validRequest = false
+        }
+
+        if (
+            reqData.xPubHash == undefined ||
+            reqData.xPubHash.length !== 64 ||
+            isNaN(reqData.startBlock) ||
+            isNaN(reqData.endBlock)
+        ) {
+            validRequest = false
+        }
+
+        if ( validRequest === false ) {
+
+            res.status(400).send({
+                status:'fail',
+                message: 'Invalid request. Body must include data object with xPubHash, startBlock, and endBlock.',
+                data: null
+            })
+            return
+
+        }
+
+        let deposits = {}
+
+        try{
+            deposits = await getDeposits(reqData.startBlock,reqData.endBlock)
+        } catch(e) {
+            res.status(500).send({
+                status:'fail',
+                message: 'Unknown Error',
+                data: null
+            })
+            return
+        }
+
+        res.status(200).send({
+            status:'success',
+            message: null,
+            data:{
+                deposits
+            },
+        })
+
+    })
+
 
     try{
         http.createServer(app).listen(serverPort);
-        console.log(`Example Server running on port:${serverPort}`)
+        console.log(`Example Server running on port ${serverPort}`)
     } catch(e) {
         console.log(e)
     }
@@ -178,7 +244,13 @@ if ( config === undefined ){
 
 })();
 
-
+/**
+ * This is an EXAMPLE function for creating an address hash string. 
+ * Addresses are generated here in a real API they would be retrieved from the DB.
+ * @param {num} startIndex Index to start generating addresses from.
+ * @param {num} numberToValidate Number of addresses to validate from index.
+ * @returns {str} Hash of deposit addresses in range. 
+ */
 async function getAddressHash(startIndex,numberToValidate){
 
     const addGen = HdAddGen.withExtPub(
@@ -201,7 +273,13 @@ async function getAddressHash(startIndex,numberToValidate){
 
 }
 
-
+/**
+ * This is an EXAMPLE function for formatting addresses for validation withing a certain range.  
+ * In a real API these addresses would be returned from the DB.
+ * @param {num} startIndex 
+ * @param {num} numberToValidate 
+ * @returns {obj} deposit address object. 
+ */
 async function getAddresses(startIndex,numberToValidate){
 
     const addGen = HdAddGen.withExtPub(
@@ -221,6 +299,35 @@ async function getAddresses(startIndex,numberToValidate){
     })
 
     return addObj
+
+}
+
+/**
+ * This is an EXAMPLE function for retrieving deposits within a certain range and formatting them for validation. 
+ * Raw wallet data is used instead of a DB.
+ * @param {num} startBlock First block in range to retrieve deposits from.
+ * @param {num} endBlock Last block in range to retrieve deposits from.
+ * @returns 
+ */
+async function getDeposits(startBlock,endBlock){
+
+    // Format wallet transactions. 
+    let formDeposits = {}
+
+    exampleDeposits.forEach(deposit => {
+        // Exclude deposits outside of range. 
+        if ( deposit.blockheight < startBlock || deposit.blockheight > endBlock ){
+            return 
+        }
+
+        if ( formDeposits[deposit.txid] === undefined ) {
+            formDeposits[deposit.txid] = {}
+        }
+
+        formDeposits[deposit.txid][deposit.address] = deposit.amount
+    });
+
+    return formDeposits
 
 }
 

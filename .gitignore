@@ -2,6 +2,8 @@ data/**
 keys/**
 logs/**
 
+test/exampleDeposits.js
+
 node_modules
 config.js
 
