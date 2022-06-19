@@ -16,10 +16,17 @@ Simple Crypto Deposit Tracking is used to generate deterministic deposits addres
 ## Requirements
 
 - Fully synced instance of bitcoind with RPC enabled. 
-- Remote POST API to configured to receive new addresses and deposits as well as verify request signatures.
+- Remote POST API to receive addresses, deposits, and run audits. 
 - Telegram Bot Id and Group Id to send incoming notifications to. 
 - Node JS ( >= v16 )
 
+## Where to Run
+
+SCDT can be run on any secure server that has access to Bitcoind's RPC API and your platform API. In most cases it is run on the same server that contains Bitcoind. The config file contains sensitive data including extended public keys, request signing keys, TG bot tokens, and bitcoind RPC credentials and should be properly secured. If this file is compromised the attacker will not gain control of any funds as no private keys are used but they could cause problems by submitting fake deposits or addresses and sending fake TG notifications as well as gaining access to your full address chain. 
+
+## What Coins Are Supported? 
+
+SCDT will theoretically work with any coin that is a clone or fork of bitcoind and has similar wallet RPC responses. Some coins have made variations to these responses so you many need to make some minor adjustments to the script for these coins. It would be better to copy the script and rename it something like 'watchDeposits-MYCOIN.js' then attempting to add a bunch of conditional statements to the Bitcoin specific watchDeposit file. 
 
 ## Setup
 
@@ -40,9 +47,9 @@ Simple Crypto Deposit Tracking is used to generate deterministic deposits addres
 
 Scripts are located in the /scripts folder and are run with node. 
 
-`` 
+``` 
 node [path to script][script] [param1] [param2] [param...]
-``
+```
 
 When running scripts from crontab or using walletnotify or blocknotify you will need to use the full path to the node executable. If crontab or bitcoind are run by a different user you should make sure node is accessible to that user and that that user has write access to the 'logs' and 'data' folders. 
 
@@ -52,9 +59,9 @@ Generates a RSA key pair used to sign requests to remote platform. Results are o
 
 *Command*
 
-``
+```
 node generateSigningKeyPair
-``
+```
 
 ### generateAddresses
 
@@ -62,13 +69,13 @@ Generates a range of deterministic addresses from a coin specific xPub key speci
 
 *Command*
 
-``
+```
 node generateAddresses [coin] [mode] [startIndex] [numberToGenerate]
 
 // Example 
 node generateAddresses BTC add 0 10000
 
-``
+```
 
 #### Options
 - *coin:* Name of the coin as set in the config file. Example: BTC
@@ -86,13 +93,13 @@ Checks wallet for new deposits or updates on deposits within confirmations less 
 
 *Command*
 
-``
+```
 node watchDeposits [coin] 
 
 // Example 
 node watchDeposits BTC
 
-``
+```
 
 #### Options
 - *coin:* Name of the coin as set in the config file. Example: BTC
@@ -104,9 +111,9 @@ This script can be run directly or periodically from the crontabs file. When run
 
 *Command*
 
-``
+```
 node monitorChains 
-``
+```
 
 ### validateAddresses
 
@@ -114,13 +121,13 @@ Regenerates address chain and compares addresses to platform addresses to insure
 
 *Command*
 
-``
+```
 node validateAddresses [coin] [validationType] [startIndex] [numberToValidate]
 
 // Example 
 node validateAddresses BTC hash 0 1000
 
-``
+```
 
 #### Options
 - *coin:* Name of the coin as set in the config file. Example: BTC
@@ -137,13 +144,13 @@ Compares wallet deposits with deposits on the platform. Inconsistencies will be 
 
 *Command*
 
-``
+```
 node validateDeposits [coin] [startBlock] [endBlock]
 
 // Example 
 node validateDeposits BTC 0 1000000
 
-``
+```
 
 #### Options
 - *coin:* Name of the coin as set in the config file. Example: BTC
@@ -153,21 +160,21 @@ node validateDeposits BTC 0 1000000
 
 ## Clone the Repository
 
-``
+```
 git clone https://github.com/tboydston/simplecrytodeposittracking.git 
-``
+```
 
 ## Add Your Config Values
 
 Create a config file by copying the config-example.js to config.js
 
-``
+```
 cp config-example.js config.js
-``
+```
 
 Open the config.js file and fill in your values. 
 
-``
+```
 
 config = { 
     "BTC":{
@@ -217,7 +224,7 @@ config = {
     }
 }
 
-``
+```
 
 
 
@@ -240,7 +247,7 @@ Make sure to change the default username and password.
 
 A functioning example endpoint is provided and may be used as a reference. To run it add the following values to your config.js file. 
 
-``
+```
     platform:{
         address:"http://127.0.0.1",
         port:7001,
@@ -251,42 +258,42 @@ A functioning example endpoint is provided and may be used as a reference. To ru
             validateDeposits:"validate/deposits"
         }
     },
-``
+```
 
 Then run the following command from the project root directory. 
 
-``
+```
 node example-platform.js
-``
+```
 
 ### Platform Routes
 
 You will need to add 4 POST routes to your platform. The actual names of these routes may be changed in the config file. 
 
-``
+```
 /addresses
 /deposits
 /validate/addresses
 /validate/deposits
-``
+```
 
 All request will be sent with the below request structure. 
 
 *Example Request Body*
 
-``
+```
 {"nonce":1655348865573,"data":{REQUEST DATA OBJECT}}
-``
+```
 
 SCDT is expecting the following response structure but in most cases it just checks for a '200' HTTP response. 
 
-``
+```
 {
     status:['success'|'fail'],
     message: 'If the request fails it is best to include a message.',
     data: null
 }
-``
+```
 
 ### Signing and Nonce
 
@@ -298,7 +305,7 @@ Every request to your platform will be signed using RSA-256 saved as hex and inc
 Receives an array of addresses. The same addresses may be sent more then once and duplicate addresses should not be allowed in the platforms DB. Also all fields submitted will never be updated and if possible should be to prevent accidental or malicious changes. 
 
 *Example Request Data*
-``
+```
 {
   coin: 'BTC',
   addresses: [{
@@ -316,14 +323,14 @@ Receives an array of addresses. The same addresses may be sent more then once an
         pubKey: '03a8a72147af8ac933a6f6d2d2ede6172ea0a3187eb33a707a5fd1f993b65test'
     }]
 }
-``
+```
 
 ### Route: /deposit
 
 Receives an array of deposits. The same deposits may be will be sent more then once as new confirmations are received. Txid and address act as a shared ID and you should never have duplicate records with the same txid and address. SCDT will keep sending updates on a deposit as new blocks come in until the number of confirmations reaches the 'notifications.notifyUntil' value. Each time you receive a new update you should update the number of confirmations for that deposit record in the DB. 
 
 *Example Request Data*
-``
+```
 {
     "coin": "BTC", 
     "txData": [{
@@ -341,26 +348,26 @@ Receives an array of deposits. The same deposits may be will be sent more then o
         "block": 739527,
         "txid": "541d5beb1f5a79bcfbebfbfab0f30dcc0595e73f15c335ada78bc70197ectest"
     }]
-``
+```
 
 ### Route: /validate/addresses
 
 Receives a request for either a hash of a concated string of address or all addresses withing a certain range. For details on how the address string that is hashed should be generated or how the addresses should be formatted see the getAddressHash and getAddress functions in the example-platform-api.js. See also the [Validate Addresses](#Validating-Addresses) section.
 
 *Example Request Data*
-``
+```
 {
     "xPubHash": "83f50d6676288093c9f58becbd57fd65a612ae70ced961039dec0ebb080a9869",
     "validationType": "hash", // This may be "hash" or "address"
     "startIndex": 0,
     "endIndex": 10
 }
-``
+```
 
 *Expected Response*
 
 Hash Request
-``
+```
 {
     status: 'success',
     message: null,
@@ -368,10 +375,10 @@ Hash Request
         hash: '3405e67bb8c9d9812c7a5546ad6903a5db61a4d3b737bc306f4e0f10ac610774'
     }
 }
-``
+```
 
 Address Request
-``
+```
 {
   status: 'success',
   message: null,
@@ -390,7 +397,7 @@ Address Request
     }
   }
 }
-``
+```
 
 
 ### Route: /validate/deposits
@@ -398,17 +405,17 @@ Address Request
 Receives a request for all deposits within a specified block range and returns them in a specific format for validation. For details on how to structure the response see the getDeposits function in the example-platform-api.js file. See also the [Validate Deposits](#Validating-Deposits) section.
 
 *Example Request Data*
-``
+```
 {
     "xPubHash": "83f50d6676288093c9f58becbd57fd65a612ae70ced961039dec0ebb080a9869",
     "startBlock": 0,
     "endBlock": 1000000
 }
-``
+```
 
 *Expected Response*
 
-``
+```
 {
 	"status": "success",
 	"message": null,
@@ -424,7 +431,7 @@ Receives a request for all deposits within a specified block range and returns t
 	}
 }
 
-``
+```
 
 ## Creating your Telegram bot and retrieving your chatID
 
@@ -448,9 +455,9 @@ While funds cannot be stolen if an attacked possesses only your extended public 
 
 In the 'scripts' folder is a js file called generateSigningKeyPair.js. This can be used to generate a public and private key pair. 
 
-``
+```
 node scripts/generateSigningKeyPair.js
-``
+```
 
 Output will be shown on the console. Copy and paste the private key to file called 'priv.key' in the 'keys' folder. Copy and paste the public key to a file called 'pub.pem' in the keys folder. The public key will be shared with your platform and used to verify the signature of requests to your platform API. 
 
@@ -462,11 +469,11 @@ Treat the 'priv.key' as a critical secret. If compromised it could be used to se
 
 Open your bitcoin.conf and add the following settings. 
 
-``
+```
 walletnotify=node /[PATH TO SCDT]/scripts/watchDeposits.js BTC walletNotify
 blocknotify=node /[PATH TO SCDT]/scripts/watchDeposits.js BTC blockNotify
 
-``
+```
 
 Then restart bitcoind. These settings will call the watchDeposit script after each transaction and register incoming deposits. 
 
@@ -480,19 +487,19 @@ Overall Bitcoind is very reliable and properly configure on a properly spec'ed s
 
 In your config file adjust the following settings. 
 
-``
+```
     chainMonitoring:{ // Check to see if chain is adding new blocks. 
         enabled:true,
         expectBlockPeriod:3600 // Maximum number of seconds expected between blocks before a notification is sent to telegram indicating their may be a chain problem.
     },
-``
+```
 
 Then in your crontab file add line executing the script as often as you would like. 
 
 *Example*
-``
+```
 */10 * * * * /[full path to node]/node /[path to folder]/scripts/monitorChains.js >> /[path to folder]/logs/monitorChains/monitorChainsCron.log
-``
+```
 
 ### NOTE 
 
@@ -507,9 +514,9 @@ To understand how your platforms endpoint should format the response data see th
 This script can be set as cron job to validate addresses periodically. 
 
 *Example*
-``
+```
 * */1 * * * /[full path to node]/node /[path to folder]/scripts/validateAddresses.js BTC hash 0 10000 >> /[path to folder]/logs/validateAddresses/validateAddressesCron.log
-``
+```
 
 
 ### NOTE 
@@ -525,9 +532,9 @@ To understand how your platforms endpoint should format the response data see th
 This script can be set as cron job to validate deposits periodically. 
 
 *Example*
-``
+```
 * */1 * * * /[full path to node]/node /[path to folder]/scripts/validateDeposits.js BTC 0 1000000 >> /[path to folder]/logs/validateDeposits/validateDepositsCron.log
-``
+```
 
 ### NOTE 
 
