@@ -130,7 +130,7 @@ const config = allConfigs[coin]
         if ( walletTx.block > endBlock ){
             return
         }
-        console.log( platformTxs[walletTx.txid] )
+
         // Confirm TX exists on platform.
         if ( platformTxs[walletTx.txid] === undefined ){
             inconsistencies += `Wallet ${coin} tx ${walletTx.txid} in block ${walletTx.blockheight} missing on platform, `

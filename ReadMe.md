@@ -23,17 +23,132 @@ Simple Crypto Deposit Tracking is used to generate deterministic deposits addres
 
 ## Setup
 
-Step 1: [Clone the repository](#clone-the-repository)
-Step 2: [Install and configure bitcoind](#getting-your-bitcoind-rpc-credentials) 
-Step 3: [Configure your platforms API](#platform-routes)
-Step 4: [Create your Telegram bot](#creating-your-telegram-bot-and-retrieving-your-chatid)
-Step 5: [Get your extended public key](#getting-your-extended-public-key--xpub)
-Step 6: [Add your config values](#add-your-config-values)
-Step 7: [Add notify routes to bitcoind](#additional-walletnotify-and-blocknotify-settings-to-bitcoindconf)
+- Step 1: [Clone the repository](#clone-the-repository)
+- Step 2: [Install and configure bitcoind](#getting-your-bitcoind-rpc-credentials) 
+- Step 3: [Configure your platforms API](#platform-routes)
+- Step 4: [Create your Telegram bot](#creating-your-telegram-bot-and-retrieving-your-chatid)
+- Step 5: [Get your extended public key](#getting-your-extended-public-key--xpub)
+- Step 6: [Generate your signing key pair](#generating-signing-keys)
+- Step 7: [Add your config values](#add-your-config-values)
+- Step 8: [Add notify routes to bitcoind](#additional-walletnotify-and-blocknotify-settings-to-bitcoindconf)
+*Optional Additional Security and Monitoring*
+- Step 9: [Add chain monitoring to your crontab](#monitoring-chains)
+- Step 10: [Add address auditing to your crontab](#validating-addresses)
+- Step 11: [Add deposit auditing to your crontab](#validate-deposits)
 
-Step 8: [Add chain monitoring to your crontab](#monitoring-chains)
-Step 9: [Add address auditing to your crontab](#validating-addresses)
-Step 10: [Add deposit auditing to your crontab](#validate-deposits)
+## Scripts
+
+Scripts are located in the /scripts folder and are run with node. 
+
+`` 
+node [path to script][script] [param1] [param2] [param...]
+``
+
+When running scripts from crontab or using walletnotify or blocknotify you will need to use the full path to the node executable. If crontab or bitcoind are run by a different user you should make sure node is accessible to that user and that that user has write access to the 'logs' and 'data' folders. 
+
+### generateKeyPair
+
+Generates a RSA key pair used to sign requests to remote platform. Results are outputted to the console. See Also: [Generating Signing Keys](#generating-signing-keys)
+
+*Command*
+
+``
+node generateSigningKeyPair
+``
+
+### generateAddresses
+
+Generates a range of deterministic addresses from a coin specific xPub key specified in the config file. Address data is displayed on the console, added to the wallet, and/or sent to the platform depending on the mode option selected. 
+
+*Command*
+
+``
+node generateAddresses [coin] [mode] [startIndex] [numberToGenerate]
+
+// Example 
+node generateAddresses BTC add 0 10000
+
+``
+
+#### Options
+- *coin:* Name of the coin as set in the config file. Example: BTC
+- *mode:* 'show'|'walletOnly'|'platformOnly'|'add'
+    - *show* Only print the addresses in console. 
+    - *walletOnly* Display addresses on console and add the addresses to the wallet but not the platform.
+    - *platformOnly* Display addresses on console and add the addresses to the platform but not the wallet.
+    - *add* Display addresses on console and add the addresses to both the wallet and the platform. 
+- *startIndex* Index to start generating addresses from. 
+- *numberToGenerate* Number of addresses to generate from that index. 
+
+### watchDeposits
+
+Checks wallet for new deposits or updates on deposits within confirmations less then or equal to the config value notifications.watchUntil. Incoming deposit information is sent to specified Telegram group and logged. The block to check for deposits from is saved in the data/lastBlock-[coin].txt file. You can resubmit deposits by resetting this value to one minus the block you would like to check for deposits from. 
+
+*Command*
+
+``
+node watchDeposits [coin] 
+
+// Example 
+node watchDeposits BTC
+
+``
+
+#### Options
+- *coin:* Name of the coin as set in the config file. Example: BTC
+
+
+### watchDeposits
+
+This script can be run directly or periodically from the crontabs file. When run the script iterates through all coins where monitoring is enabled ( config value: chainMonitoring.enabled ) and confirms their RPC api is running and that they are adding blocks. See [Monitoring Chains](#monitoring-chains) for more details.
+
+*Command*
+
+``
+node monitorChains 
+``
+
+### validateAddresses
+
+Regenerates address chain and compares addresses to platform addresses to insure that platform addresses to insure they have not been tampered with. Inconsistencies will be logged and sent to Telegram directly. See [Validating Addresses](#validating-addresses) for more details.
+
+*Command*
+
+``
+node validateAddresses [coin] [validationType] [startIndex] [numberToValidate]
+
+// Example 
+node validateAddresses BTC hash 0 1000
+
+``
+
+#### Options
+- *coin:* Name of the coin as set in the config file. Example: BTC
+- *mode:* 'hash'|'addresses'
+    - *hash* Validate a hash of all addresses. 
+    - *addressse*  Validate each address one by one.
+- *startIndex* Index to start validating addresses from. 
+- *numberToValidate* Number of addresses to validate from that index. 
+
+
+### validateDeposits
+
+Compares wallet deposits with deposits on the platform. Inconsistencies will be logged and sent to Telegram directly. See [Validate Deposits](#validate-deposits) for more details.
+
+*Command*
+
+``
+node validateDeposits [coin] [startBlock] [endBlock]
+
+// Example 
+node validateDeposits BTC 0 1000000
+
+``
+
+#### Options
+- *coin:* Name of the coin as set in the config file. Example: BTC
+- *startBlock* Block to start validating deposits from.
+- *endBlock* Block to stop validating deposits from.
 
 
 ## Clone the Repository
@@ -56,7 +171,7 @@ Open the config.js file and fill in your values.
 
 config = { 
     "BTC":{
-        addressGen:{ // Xpub and BIP used to generate your deterministic deposit addresses.
+        addressGen:{ // Xpub ( or yPub, zPub, ect. ) and BIP used to generate your deterministic deposit addresses.
             xpub:"YOUR XPUB",
             bip:84
         },  
@@ -331,10 +446,10 @@ While funds cannot be stolen if an attacked possesses only your extended public 
 
 ## Generating Signing Keys
 
-In the 'scripts' folder is a js file called generateKeyPairs.js. This can be used to generate a public and private key pair. 
+In the 'scripts' folder is a js file called generateSigningKeyPair.js. This can be used to generate a public and private key pair. 
 
 ``
-node scripts/generateKeyPairs.js
+node scripts/generateSigningKeyPair.js
 ``
 
 Output will be shown on the console. Copy and paste the private key to file called 'priv.key' in the 'keys' folder. Copy and paste the public key to a file called 'pub.pem' in the keys folder. The public key will be shared with your platform and used to verify the signature of requests to your platform API. 
