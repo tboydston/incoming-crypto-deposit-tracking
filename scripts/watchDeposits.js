@@ -167,8 +167,14 @@ let method = process.argv[3]
             Address: [${tx.address}](${config.explorer.address}${tx.address})
             Amount: ${tx.amount}
             Confirmations: ${tx.confirmations===undefined?0:tx.confirmations}
-            Block: [${tx.blockheight}](${config.explorer.block}${tx.blockheight})
-            TxId: [${tx.txid}](${config.explorer.tx}${tx.txid})\n`
+            TxId: [${tx.txid}](${config.explorer.tx}${tx.txid})`
+
+            if (tx.blockheight===undefined) {
+                depositString += `\n`
+            } else {
+                depositString += `Block: [${tx.blockheight}](${config.explorer.block}${tx.blockheight})\n`
+            }
+            
         }
 
         // Find the highest block to track deposits from.
