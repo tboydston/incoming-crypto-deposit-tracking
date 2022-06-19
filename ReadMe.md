@@ -1,17 +1,24 @@
 # Simple Crypto Deposit Tracking ( SCDT )
 
+
 ## Overview
 
-Simple Crypto Deposit Tracking is used to generate deterministic deposits addresses from a extended public key, monitor these addresses for deposits, and notify an external platform and telegram group of new incoming deposits, monitor running chains and periodically audit deposit and address records. 
+SCDT is a crypto deposit tracker for Bitcoin and Bitcoin-like( clone coins ) crypto currencies. Essentially it generates a string of deterministic addresses, adds these addresses to Bitcoind's wallet as well as your platform and watches these address for new deposits. When a new deposit is received a notification is sent to your platform as well as to your private Telegram group. 
+
+Funds can be retrieved using any wallet that supports deterministic address generation and setting a custom [gap limit](https://support.ledger.com/hc/en-us/articles/360010892360-Address-gap-limit?docs=true) such as Electrum, Trezor( through Electrum ), and Ledger. 
+
+All addresses are generated using your wallets extended public key so no private keys are used making it impossible for hackers to steal your funds by compromising your wallet watching server. 
+
 
 ### Features
 
 - Self sovereign
-- BIP 39 deterministic address generation. 
+- Deterministic address generation( BIP 32,44,49,84,141  ). 
 - Uses only xPub key so no private keys are exposed. 
 - Signed API request to platform to confirm authenticity of requests. 
 - Integration with Telegram to notify admin of incoming deposits or chain issues. 
 - Only makes outgoing request so no need to open additional ports. 
+
 
 ## Requirements
 
@@ -20,28 +27,33 @@ Simple Crypto Deposit Tracking is used to generate deterministic deposits addres
 - Telegram Bot Id and Group Id to send incoming notifications to. 
 - Node JS ( >= v16 )
 
+
 ## Where to Run
 
 SCDT can be run on any secure server that has access to Bitcoind's RPC API and your platform API. In most cases it is run on the same server that contains Bitcoind. The config file contains sensitive data including extended public keys, request signing keys, TG bot tokens, and bitcoind RPC credentials and should be properly secured. If this file is compromised the attacker will not gain control of any funds as no private keys are used but they could cause problems by submitting fake deposits or addresses and sending fake TG notifications as well as gaining access to your full address chain. 
+
 
 ## What Coins Are Supported? 
 
 SCDT will theoretically work with any coin that is a clone or fork of bitcoind and has similar wallet RPC responses. Some coins have made variations to these responses so you many need to make some minor adjustments to the script for these coins. It would be better to copy the script and rename it something like 'watchDeposits-MYCOIN.js' then attempting to add a bunch of conditional statements to the Bitcoin specific watchDeposit file. 
 
+
 ## Setup
 
 - Step 1: [Clone the repository](#clone-the-repository)
 - Step 2: [Install and configure bitcoind](#getting-your-bitcoind-rpc-credentials) 
-- Step 3: [Configure your platforms API](#platform-routes)
+- Step 3: [Configure your platforms API](#platform-api-and-routes)
 - Step 4: [Create your Telegram bot](#creating-your-telegram-bot-and-retrieving-your-chatid)
 - Step 5: [Get your extended public key](#getting-your-extended-public-key--xpub)
 - Step 6: [Generate your signing key pair](#generating-signing-keys)
 - Step 7: [Add your config values](#add-your-config-values)
 - Step 8: [Add notify routes to bitcoind](#additional-walletnotify-and-blocknotify-settings-to-bitcoindconf)
-*Optional Additional Security and Monitoring*
-- Step 9: [Add chain monitoring to your crontab](#monitoring-chains)
-- Step 10: [Add address auditing to your crontab](#validating-addresses)
-- Step 11: [Add deposit auditing to your crontab](#validate-deposits)
+- Step 9: [Generate deposit addresses](#generateaddresses)
+*Optional Additional Security and Monitoring Steps*
+- Step 10: [Add chain monitoring to your crontab](#monitoring-chains)
+- Step 11: [Add address auditing to your crontab](#validating-addresses)
+- Step 12: [Add deposit auditing to your crontab](#validate-deposits)
+
 
 ## Scripts
 
@@ -53,6 +65,7 @@ node [path to script][script] [param1] [param2] [param...]
 
 When running scripts from crontab or using walletnotify or blocknotify you will need to use the full path to the node executable. If crontab or bitcoind are run by a different user you should make sure node is accessible to that user and that that user has write access to the 'logs' and 'data' folders. 
 
+
 ### generateKeyPair
 
 Generates a RSA key pair used to sign requests to remote platform. Results are outputted to the console. See Also: [Generating Signing Keys](#generating-signing-keys)
@@ -62,6 +75,7 @@ Generates a RSA key pair used to sign requests to remote platform. Results are o
 ```
 node generateSigningKeyPair
 ```
+
 
 ### generateAddresses
 
@@ -77,6 +91,7 @@ node generateAddresses BTC add 0 10000
 
 ```
 
+
 #### Options
 - *coin:* Name of the coin as set in the config file. Example: BTC
 - *mode:* 'show'|'walletOnly'|'platformOnly'|'add'
@@ -86,6 +101,7 @@ node generateAddresses BTC add 0 10000
     - *add* Display addresses on console and add the addresses to both the wallet and the platform. 
 - *startIndex* Index to start generating addresses from. 
 - *numberToGenerate* Number of addresses to generate from that index. 
+
 
 ### watchDeposits
 
@@ -101,8 +117,10 @@ node watchDeposits BTC
 
 ```
 
+
 #### Options
 - *coin:* Name of the coin as set in the config file. Example: BTC
+
 
 
 ### watchDeposits
@@ -114,6 +132,7 @@ This script can be run directly or periodically from the crontabs file. When run
 ```
 node monitorChains 
 ```
+
 
 ### validateAddresses
 
@@ -129,6 +148,7 @@ node validateAddresses BTC hash 0 1000
 
 ```
 
+
 #### Options
 - *coin:* Name of the coin as set in the config file. Example: BTC
 - *mode:* 'hash'|'addresses'
@@ -136,6 +156,7 @@ node validateAddresses BTC hash 0 1000
     - *addressse*  Validate each address one by one.
 - *startIndex* Index to start validating addresses from. 
 - *numberToValidate* Number of addresses to validate from that index. 
+
 
 
 ### validateDeposits
@@ -152,10 +173,12 @@ node validateDeposits BTC 0 1000000
 
 ```
 
+
 #### Options
 - *coin:* Name of the coin as set in the config file. Example: BTC
 - *startBlock* Block to start validating deposits from.
 - *endBlock* Block to stop validating deposits from.
+
 
 
 ## Clone the Repository
@@ -163,6 +186,7 @@ node validateDeposits BTC 0 1000000
 ```
 git clone https://github.com/tboydston/simplecrytodeposittracking.git 
 ```
+
 
 ## Add Your Config Values
 
@@ -228,6 +252,7 @@ config = {
 
 
 
+
 ## Getting your Bitcoind RPC credentials
 
 Bitcoind RPC credentials can be set in the bitcoin.conf file. 
@@ -238,9 +263,11 @@ Currently `rpcuser` and `rpcpassword` are used for authentication. As authentica
 
 This guide assumes that you are running SCDT on the same server as Bitcoind. If you are not you can consider mapping the RPC port from the server where Bitcoind is hosted to the server where SCDT is hosted. Instruction on how to do this can be found [here](https://linuxize.com/post/how-to-setup-ssh-tunneling/#:~:text=For%20remote%20port%20forwarding%2C%20enter,in%20the%20Source%20Port%20field.). 
 
+
 ### WARNING 
 
 Make sure to change the default username and password.
+
 
 
 ## Configuring your Platform API
@@ -266,7 +293,18 @@ Then run the following command from the project root directory.
 node example-platform.js
 ```
 
-### Platform Routes
+
+### Platform API and Routes
+
+A functioning example api stub is included in the *example-platform-api.js* file and can be used as a reference. You will need to at least add signing keys to the config.js file for it to run. 
+
+
+### Signing and Nonce
+
+Every request to your platform will be signed using RSA-256 saved as hex and included in the 'Signature' header. The body will also include a nonce before transmission. Every request should be verified against SCDT's pubKey to insure it is valid and the nonce checked to insure it is not more then a few seconds old. For further details on the signing and POST requests see the lib/RequestManager.js and lib/signatureManger.js files.
+
+
+### Routes Overview
 
 You will need to add 4 POST routes to your platform. The actual names of these routes may be changed in the config file. 
 
@@ -295,10 +333,6 @@ SCDT is expecting the following response structure but in most cases it just che
 }
 ```
 
-### Signing and Nonce
-
-Every request to your platform will be signed using RSA-256 saved as hex and included in the 'Signature' header. The body will also include a nonce before transmission. Every request should be verified against SCDT's pubKey to insure it is valid and the nonce checked to insure it is not more then a few seconds old. For further details on the signing and POST requests see the lib/RequestManager.js and lib/signatureManger.js files.
-
 
 ### Route: /addresses
 
@@ -325,6 +359,7 @@ Receives an array of addresses. The same addresses may be sent more then once an
 }
 ```
 
+
 ### Route: /deposit
 
 Receives an array of deposits. The same deposits may be will be sent more then once as new confirmations are received. Txid and address act as a shared ID and you should never have duplicate records with the same txid and address. SCDT will keep sending updates on a deposit as new blocks come in until the number of confirmations reaches the 'notifications.notifyUntil' value. Each time you receive a new update you should update the number of confirmations for that deposit record in the DB. 
@@ -349,6 +384,7 @@ Receives an array of deposits. The same deposits may be will be sent more then o
         "txid": "541d5beb1f5a79bcfbebfbfab0f30dcc0595e73f15c335ada78bc70197ectest"
     }]
 ```
+
 
 ### Route: /validate/addresses
 
@@ -400,6 +436,7 @@ Address Request
 ```
 
 
+
 ### Route: /validate/deposits
 
 Receives a request for all deposits within a specified block range and returns them in a specific format for validation. For details on how to structure the response see the getDeposits function in the example-platform-api.js file. See also the [Validate Deposits](#Validating-Deposits) section.
@@ -433,6 +470,7 @@ Receives a request for all deposits within a specified block range and returns t
 
 ```
 
+
 ## Creating your Telegram bot and retrieving your chatID
 
 Follow the instructions [here](https://core.telegram.org/bots) to create your bot. 
@@ -441,15 +479,18 @@ Create a group in Telegram that you would like deposit notifications to be sent 
 
 Follow one of the solutions [here](https://stackoverflow.com/questions/32423837/telegram-bot-how-to-get-a-group-chat-id) on how to retrieve your ChatId.
 
+
 ## Getting Your Extended Public Key ( xPub )
 
 Trezor: See [Here](https://wiki.trezor.io/Suite_manual:Displaying_account_public_key_(XPUB)#:~:text=Go%20to%20the%20Accounts%20tab,QR%20code%20and%20as%20text.)
 Electrum: Select "Wallet" from the menu bar and then "Information". The key is in the 'Master Public Key' section.
 Ledger: See [Here](https://support.ledger.com/hc/en-us/articles/360011069619-Extended-public-key?docs=true)
 
+
 ### WARNING 
 
 While funds cannot be stolen if an attacked possesses only your extended public key it can but used to recreated your address chain. This will reveal all of your deposits addresses and make your wallet trackable. Treat this key as a critical secret. 
+
 
 ## Generating Signing Keys
 
@@ -461,9 +502,11 @@ node scripts/generateSigningKeyPair.js
 
 Output will be shown on the console. Copy and paste the private key to file called 'priv.key' in the 'keys' folder. Copy and paste the public key to a file called 'pub.pem' in the keys folder. The public key will be shared with your platform and used to verify the signature of requests to your platform API. 
 
+
 ### WARNING 
 
 Treat the 'priv.key' as a critical secret. If compromised it could be used to send fake deposits notifications to your platform or add addresses to the server that you do not control the private keys to. 
+
 
 ## Additional walletnotify and blocknotify Settings to Bitcoind.conf
 
@@ -477,9 +520,11 @@ blocknotify=node /[PATH TO SCDT]/scripts/watchDeposits.js BTC blockNotify
 
 Then restart bitcoind. These settings will call the watchDeposit script after each transaction and register incoming deposits. 
 
+
 ### NOTE 
 
 If the watchDeposits script is not being executed correctly confirm that node js is accessible to all users. For linux systems see this [article](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-with-nvm-node-version-manager-on-a-vps).
+
 
 ## Monitoring Chains
 
@@ -501,9 +546,11 @@ Then in your crontab file add line executing the script as often as you would li
 */10 * * * * /[full path to node]/node /[path to folder]/scripts/monitorChains.js >> /[path to folder]/logs/monitorChains/monitorChainsCron.log
 ```
 
+
 ### NOTE 
 
 Make sure and include the full path to node and that this version is executable by crontab.
+
 
 ## Validating Addresses 
 
@@ -519,9 +566,11 @@ This script can be set as cron job to validate addresses periodically.
 ```
 
 
+
 ### NOTE 
 
 This is not the only measure that should be taken in order to ensure address integrity. You should take additional measure on your platform to insure that addresses are not added under a new xPubHash, modified before being sent to the user, or changed when displayed on the frontend. 
+
 
 ## Validate Deposits
 
@@ -535,6 +584,7 @@ This script can be set as cron job to validate deposits periodically.
 ```
 * */1 * * * /[full path to node]/node /[path to folder]/scripts/validateDeposits.js BTC 0 1000000 >> /[path to folder]/logs/validateDeposits/validateDepositsCron.log
 ```
+
 
 ### NOTE 
 
