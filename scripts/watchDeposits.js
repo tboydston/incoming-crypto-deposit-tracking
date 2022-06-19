@@ -166,7 +166,7 @@ let method = process.argv[3]
             `Deposit ${txData.length}
             Address: [${tx.address}](${config.explorer.address}${tx.address})
             Amount: ${tx.amount}
-            Confirmations: ${tx.confirmations}
+            Confirmations: ${tx.confirmations===undefined?0:tx.confirmations}
             Block: [${tx.blockheight}](${config.explorer.block}${tx.blockheight})
             TxId: [${tx.txid}](${config.explorer.tx}${tx.txid})\n`
         }
