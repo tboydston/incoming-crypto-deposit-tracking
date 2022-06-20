@@ -139,6 +139,7 @@ let method = process.argv[3]
     let depositString = ""
     let heighestBlock = 0
     let pubKeyHash = crypto.createHash('sha256').update(config.addressGen.xpub).digest('hex')
+    let noteNumber = 1
 
     // Format transactions for platform. 
     txs.forEach(tx => {
@@ -162,7 +163,7 @@ let method = process.argv[3]
             method === 'notifyAll'
         ) {
             depositString += 
-            `Deposit ${txData.length}
+            `Deposit ${noteNumber}
             Address: [${tx.address}](${config.explorer.address}${tx.address})
             Amount: ${tx.amount}
             Confirmations: ${tx.confirmations===undefined?0:tx.confirmations}
@@ -183,6 +184,8 @@ let method = process.argv[3]
         ) {
             heighestBlock = tx.blockheight
         }
+
+        noteNumber++
 
     });
 

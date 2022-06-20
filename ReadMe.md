@@ -94,7 +94,7 @@ node generateAddresses BTC add 0 10000
 
 #### Options
 - *coin:* Name of the coin as set in the config file. Example: BTC
-- *mode:* 'show'|'walletOnly'|'platformOnly'|'add'
+- *mode:* show|walletOnly|platformOnly|add
     - *show* Only print the addresses in console. 
     - *walletOnly* Display addresses on console and add the addresses to the wallet but not the platform.
     - *platformOnly* Display addresses on console and add the addresses to the platform but not the wallet.
@@ -228,7 +228,7 @@ config = {
         },
         notifications:{
             unconfirmed:true, // Send a Telegram notification when their is a new unconfirmed transaction.
-            confirm:true, // Send a Telegram notification when their is a new confirmed transaction.
+            confirmed:true, // Send a Telegram notification when their is a new confirmed transaction.
             watchUntil:4, // Update the platform on a deposit until X confirmations. 
             when:0, // Not when a certain number of confirmations is reached. Can't be greater than watchConfirmations. 
             telegram:{

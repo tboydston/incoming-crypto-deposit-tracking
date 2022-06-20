@@ -98,17 +98,16 @@ const config = allConfigs[coin]
         const newHighestBlock = hashResponse.data.result
         const checkDurationMin = ( ( now - data.lastBlockScanTime ) / 60 ).toFixed(0)
         const warningThreshold = ( config.chainMonitoring.expectBlockPeriod / 60 ).toFixed(0)
-        console.log(newHighestBlock, data.lastBlock)
-        
+
         // If the block number has not been changed within our expected block period we log and send a warning to TG. 
         if ( newHighestBlock <= data.lastBlock && data.lastBlockScanTime < now - config.chainMonitoring.expectBlockPeriod ){
-            lm.log(`${coin} chain has not updated in over ${checkDurationMin} minute(s).`,true,true)
+            lm.log(`${coin} chain has not updated in over ${checkDurationMin} minute\\(s\\).`,true,true)
             continue
         } 
 
         // If the block number has not been changed but time between blocks is still less than the expected block period we log that we scanned but don't notify TG. 
         if ( newHighestBlock <= data.lastBlock) {
-            lm.log(`${coin} chain has not updated in over ${checkDurationMin} minute(s). Within warning threshold of ${warningThreshold} minute(s). No notification sent.`,true,false)
+            lm.log(`${coin} chain has not updated in over ${checkDurationMin} minute\\(s\\). Within warning threshold of ${warningThreshold} minute\\(s\\). No notification sent.`,true,false)
             continue
         }
 
