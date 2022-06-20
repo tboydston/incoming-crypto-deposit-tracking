@@ -155,13 +155,12 @@ let method = process.argv[3]
         })
 
         // Check to see if we should send a notification about this transaction.
-        if ( 
-            ( method === 'walletNotify' && 
-            ( ( tx.confirmations === 0 && config.notifications.unconfirmed ) ||
-            ( tx.confirmations === 1 && config.notifications.confirmed ) ) ) || 
-            ( tx.confirmations === config.notifications.when && tx.confirmations > 1 ) || 
+        if (
+            ( tx.confirmations === 0 && config.notifications.unconfirmed ) ||
+            ( method === 'blockNotify' && tx.confirmations === 1 && config.notifications.confirmed ) ||
+            ( tx.confirmations === config.notifications.when && tx.confirmations > 1 ) ||
             method === 'notifyAll'
-        ){
+        ) {
             depositString += 
             `Deposit ${txData.length}
             Address: [${tx.address}](${config.explorer.address}${tx.address})
@@ -174,7 +173,6 @@ let method = process.argv[3]
             } else {
                 depositString += `Block: [${tx.blockheight}](${config.explorer.block}${tx.blockheight})\n`
             }
-            
         }
 
         // Find the highest block to track deposits from.

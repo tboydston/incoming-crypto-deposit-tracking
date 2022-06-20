@@ -44,7 +44,7 @@ SCDT will theoretically work with any coin that is a clone or fork of bitcoind a
 - Step 2: [Install and configure bitcoind](#getting-your-bitcoind-rpc-credentials) 
 - Step 3: [Configure your platforms API](#platform-api-and-routes)
 - Step 4: [Create your Telegram bot](#creating-your-telegram-bot-and-retrieving-your-chatid)
-- Step 5: [Get your extended public key](#getting-your-extended-public-key--xpub)
+- Step 5: [Get your extended public key](#getting-your-extended-public-key-xpub)
 - Step 6: [Generate your signing key pair](#generating-signing-keys)
 - Step 7: [Add your config values](#add-your-config-values)
 - Step 8: [Add notify routes to bitcoind](#additional-walletnotify-and-blocknotify-settings-to-bitcoindconf)
