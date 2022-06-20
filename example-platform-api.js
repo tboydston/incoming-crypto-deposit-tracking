@@ -8,6 +8,7 @@ const crypto = require('crypto')
 const HdAddGen = require('hdaddressgenerator')
 
 const serverPort = 7001
+const nonceTolerance = 1000
 
 const validationTypes = ['hash','address']
 
@@ -44,11 +45,32 @@ try {
 
         const sigResult = await sigMan.verify(pubKey,req.body,req.headers.signature) 
         if ( sigResult ) return next() 
-
+        console.log(`Invalid signature.`)
         res.status(403).send({
             status:'fail',
             message: 'Invalid signature.'
         })
+        return
+
+    })
+
+    // Validate nonce on all requests. 
+    app.use(async (req, res, next) => {
+
+
+        let now = Date.now()
+        let nonce = JSON.parse(req.body).nonce
+
+        if ( nonce === undefined || nonce < now - nonceTolerance ){
+            console.log(`Invalid nonce. Sent: ${nonce}, No later then: ${now - nonceTolerance}`)
+            res.status(403).send({
+                status:'fail',
+                message: 'Invalid nonce.'
+            })
+            return 
+        }
+
+        return next()
 
     })
 
