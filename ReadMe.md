@@ -1,9 +1,6 @@
-# Simple Crypto Deposit Tracking ( SCDT )
+# Incoming! Crypto Deposit Tracking
 
-
-## Overview
-
-SCDT is a crypto deposit tracker for Bitcoin and Bitcoin-like( clone coins ) crypto currencies. Essentially it generates a string of deterministic addresses, adds these addresses to Bitcoind's wallet as well as your platform and watches these address for new deposits. When a new deposit is received a notification is sent to your platform as well as to your private Telegram group. 
+Incoming! is a crypto deposit tracker for Bitcoin and Bitcoin-like( clone coins ) crypto currencies. Essentially it generates a string of deterministic addresses, adds these addresses to Bitcoind's wallet as well as your platform and watches these address for new deposits. When a new deposit is received a notification is sent to your platform as well as to your private Telegram group. 
 
 Funds can be retrieved using any wallet that supports deterministic address generation and setting a custom [gap limit](https://support.ledger.com/hc/en-us/articles/360010892360-Address-gap-limit?docs=true) such as Electrum, Trezor( through Electrum ), and Ledger. 
 
@@ -30,29 +27,30 @@ All addresses are generated using your wallets extended public key so no private
 
 ## Where to Run
 
-SCDT can be run on any secure server that has access to Bitcoind's RPC API and your platform API. In most cases it is run on the same server that contains Bitcoind. The config file contains sensitive data including extended public keys, request signing keys, TG bot tokens, and bitcoind RPC credentials and should be properly secured. If this file is compromised the attacker will not gain control of any funds as no private keys are used but they could cause problems by submitting fake deposits or addresses and sending fake TG notifications as well as gaining access to your full address chain. 
+Incoming! can be run on any secure server that has access to Bitcoind's RPC API and your platform API. In most cases it is run on the same server that contains Bitcoind. The config file contains sensitive data including extended public keys, request signing keys, TG bot tokens, and bitcoind RPC credentials and should be properly secured. If this file is compromised the attacker will not gain control of any funds as no private keys are used but they could cause problems by submitting fake deposits or addresses and sending fake TG notifications as well as gaining access to your full address chain. 
 
 
 ## What Coins Are Supported? 
 
-SCDT will theoretically work with any coin that is a clone or fork of bitcoind and has similar wallet RPC responses. Some coins have made variations to these responses so you many need to make some minor adjustments to the script for these coins. It would be better to copy the script and rename it something like 'watchDeposits-MYCOIN.js' then attempting to add a bunch of conditional statements to the Bitcoin specific watchDeposit file. 
+Incoming! will theoretically work with any coin that is a clone or fork of bitcoind and has similar wallet RPC responses and supports walletnotify and blocknotify. Some coins have made variations to these responses so you many need to make some minor adjustments to the script for these coins. It would be better to copy the script and rename it something like 'watchDeposits-MYCOIN.js' then attempting to add a bunch of conditional statements to the Bitcoin specific watchDeposit script. 
 
 
 ## Setup
 
-- Step 1: [Clone the repository](#clone-the-repository)
-- Step 2: [Install and configure bitcoind](#getting-your-bitcoind-rpc-credentials) 
-- Step 3: [Configure your platforms API](#platform-api-and-routes)
-- Step 4: [Create your Telegram bot](#creating-your-telegram-bot-and-retrieving-your-chatid)
-- Step 5: [Get your extended public key](#getting-your-extended-public-key-xpub)
-- Step 6: [Generate your signing key pair](#generating-signing-keys)
-- Step 7: [Add your config values](#add-your-config-values)
-- Step 8: [Add notify routes to bitcoind](#additional-walletnotify-and-blocknotify-settings-to-bitcoindconf)
-- Step 9: [Generate deposit addresses](#generateaddresses)
+- Step 1: [Clone the repository.](#clone-the-repository)
+- Step 2: [Install and configure bitcoind.](#getting-your-bitcoind-rpc-credentials) 
+- Step 3: [Configure your platforms API.](#platform-api-and-routes)
+- Step 4: [Create your Telegram bot.](#creating-your-telegram-bot-and-retrieving-your-chatid)
+- Step 5: [Get your extended public key.](#getting-your-extended-public-key-xpub)
+- Step 6: [Generate your signing key pair.](#generating-signing-keys)
+- Step 7: [Add your config values.](#add-your-config-values)
+- Step 8: [Add notify routes to bitcoind.](#additional-walletnotify-and-blocknotify-settings-to-bitcoindconf)
+- Step 9: [Generate deposit addresses.](#generateaddresses)
 *Optional Additional Security and Monitoring Steps*
-- Step 10: [Add chain monitoring to your crontab](#monitoring-chains)
-- Step 11: [Add address auditing to your crontab](#validating-addresses)
-- Step 12: [Add deposit auditing to your crontab](#validate-deposits)
+- Step 10: [Add chain monitoring to your crontab.](#monitoring-chains)
+- Step 11: [Add address auditing to your crontab.](#validating-addresses)
+- Step 12: [Add deposit auditing to your crontab.](#validate-deposits)
+- Step 13: [Adjust sending wallet gap limit.](#sending-funds)
 
 
 ## Scripts
@@ -184,7 +182,7 @@ node validateDeposits BTC 0 1000000
 ## Clone the Repository
 
 ```
-git clone https://github.com/tboydston/simplecrytodeposittracking.git 
+git clone https://github.com/tboydston/incoming-crypto-deposit-tracking.git 
 ```
 
 
@@ -261,7 +259,7 @@ Instructions on how to find the .conf file can be found [here](https://github.co
 
 Currently `rpcuser` and `rpcpassword` are used for authentication. As authentication via username and password will soon be deprecated future version will switch to cookie based authentication. 
 
-This guide assumes that you are running SCDT on the same server as Bitcoind. If you are not you can consider mapping the RPC port from the server where Bitcoind is hosted to the server where SCDT is hosted. Instruction on how to do this can be found [here](https://linuxize.com/post/how-to-setup-ssh-tunneling/#:~:text=For%20remote%20port%20forwarding%2C%20enter,in%20the%20Source%20Port%20field.). 
+This guide assumes that you are running Incoming! on the same server as Bitcoind. If you are not you can consider mapping the RPC port from the server where Bitcoind is hosted to the server where Incoming! is hosted. Instruction on how to do this can be found [here](https://linuxize.com/post/how-to-setup-ssh-tunneling/#:~:text=For%20remote%20port%20forwarding%2C%20enter,in%20the%20Source%20Port%20field.). 
 
 
 ### WARNING 
@@ -301,7 +299,7 @@ A functioning example api stub is included in the *example-platform-api.js* file
 
 ### Signing and Nonce
 
-Every request to your platform will be signed using RSA-256 saved as hex and included in the 'Signature' header. The body will also include a nonce before transmission. Every request should be verified against SCDT's pubKey to insure it is valid and the nonce checked to insure it is not more then a few seconds old. For further details on the signing and POST requests see the lib/RequestManager.js and lib/signatureManger.js files.
+Every request to your platform will be signed using RSA-256 saved as hex and included in the 'Signature' header. The body will also include a nonce before transmission. Every request should be verified against Incoming!'s pubKey to insure it is valid and the nonce checked to insure it is not more then a few seconds old. For further details on the signing and POST requests see the lib/RequestManager.js and lib/signatureManger.js files.
 
 
 ### Routes Overview
@@ -323,7 +321,7 @@ All request will be sent with the below request structure.
 {"nonce":1655348865573,"data":{REQUEST DATA OBJECT}}
 ```
 
-SCDT is expecting the following response structure but in most cases it just checks for a '200' HTTP response. 
+Incoming! is expecting the following response structure but in most cases it just checks for a '200' HTTP response. 
 
 ```
 {
@@ -362,7 +360,7 @@ Receives an array of addresses. The same addresses may be sent more then once an
 
 ### Route: /deposit
 
-Receives an array of deposits. The same deposits may be will be sent more then once as new confirmations are received. Txid and address act as a shared ID and you should never have duplicate records with the same txid and address. SCDT will keep sending updates on a deposit as new blocks come in until the number of confirmations reaches the 'notifications.notifyUntil' value. Each time you receive a new update you should update the number of confirmations for that deposit record in the DB. 
+Receives an array of deposits. The same deposits may be will be sent more then once as new confirmations are received. Txid and address act as a shared ID and you should never have duplicate records with the same txid and address. Incoming! will keep sending updates on a deposit as new blocks come in until the number of confirmations reaches the 'notifications.notifyUntil' value. Each time you receive a new update you should update the number of confirmations for that deposit record in the DB. 
 
 *Example Request Data*
 ```
@@ -513,8 +511,8 @@ Treat the 'priv.key' as a critical secret. If compromised it could be used to se
 Open your bitcoin.conf and add the following settings. 
 
 ```
-walletnotify=node /[PATH TO SCDT]/scripts/watchDeposits.js BTC walletNotify
-blocknotify=node /[PATH TO SCDT]/scripts/watchDeposits.js BTC blockNotify
+walletnotify=node /[PATH TO Incoming!]/scripts/watchDeposits.js BTC walletNotify
+blocknotify=node /[PATH TO Incoming!]/scripts/watchDeposits.js BTC blockNotify
 
 ```
 
@@ -588,4 +586,17 @@ This script can be set as cron job to validate deposits periodically.
 
 ### NOTE 
 
-This is not the only measure that should be taken to insure deposit integrity. This method only looks for xPubHash keys that SCDT knows about. A fake deposit could still be inserted under a different xPubHash
+This is not the only measure that should be taken to insure deposit integrity. This method only looks for xPubHash keys that Incoming! knows about. A fake deposit could still be inserted under a different xPubHash
+
+## Sending Funds
+
+Since Incoming! only tracks public keys you will need an additional wallet, preferable on a secure machine or using a hardware wallet to recover the funds. Incoming! can track as many addresses as bitcoind's wallet can track which has been [tested](https://bitcoin.stackexchange.com/questions/24947/what-is-the-maximum-of-receive-addresses-the-default-wallet-can-handle) into the millions. It is important that you keep track of how many addresses you add to Incoming! so you can adjust your sending wallet to make sure it is tracking at least that many addresses. On some wallets you can do this by adjusting the gap limit ([moreInfoHere](https://support.ledger.com/hc/en-us/articles/360010892360-Address-gap-limit?docs=true)), others allow you to pre-generate addresses.  
+
+### Adjusting Gap Limit on Adding Addresses to Popular Wallets
+- [Electrum, also works with electrum Trezor wallets](https://electrum.readthedocs.io/en/latest/faq.html#what-is-the-gap-limit)
+- [Ledger](https://support.ledger.com/hc/en-us/articles/360010892360-Address-gap-limit?docs=true)
+
+### Limits 
+
+Both Electrum and Ledger require sending your addresses to their servers for tracking ( Electrum is a distributed service so 'their servers' in this context is whatever node you connect to. ). This causes 2 issues. The firsts is that it tells a 3rd party what addresses belong to you which reduces anonymity. The second is that this 3rd party is essentially offering you a free service with no guarantee of performance. So if you ask them to monitor millions of addresses for you may experience performance issues or tracking failures.
+
