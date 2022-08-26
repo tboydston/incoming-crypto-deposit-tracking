@@ -106,7 +106,7 @@ const config = allConfigs[coin]
 
         remoteFormatted.addresses.push({
             xPubHash:pubKeyHash,
-            index:index,
+            index:parseInt(index),
             path:address.path,
             address:address.address,
             pubKey:address.pubKey
