@@ -120,7 +120,7 @@ const config = allConfigs[coin]
                 "timestamp":"now"
             }
         )
-        console.log(remoteFormatted)
+
         index++
 
     });
