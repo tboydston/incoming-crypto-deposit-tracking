@@ -149,11 +149,11 @@ node validateAddresses BTC hash 0 1000
 
 #### Options
 - *coin:* Name of the coin as set in the config file. Example: BTC
-- *mode:* hash|addresses
+- *validationType:* hash|addresses
     - *hash* Validate a hash of all addresses. 
-    - *addressse*  Validate each address one by one.
+    - *address*  Validate each address one by one.
 - *startIndex* Index to start validating addresses from. 
-- *numberToValidate* Number of addresses to validate from that index. 
+- *endIndex* Number of addresses to validate from that index. 
 
 
 
