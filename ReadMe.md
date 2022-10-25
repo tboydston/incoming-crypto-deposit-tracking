@@ -502,7 +502,7 @@ Output will be shown on the console. Copy and paste the private key to file call
 Treat the 'priv.key' as a critical secret. If compromised it could be used to send fake deposits or add fake addresses to your platform. 
 
 
-## Additional walletnotify and blocknotify Settings to Bitcoind.conf
+## Adding walletnotify and blocknotify Settings to Bitcoind.conf
 
 Open your bitcoin.conf and add the following settings. 
 

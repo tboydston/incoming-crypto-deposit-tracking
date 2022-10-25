@@ -201,7 +201,7 @@ let method = process.argv[3]
         })
         lm.log(`Notified platform of deposit. Deposit: ${JSON.stringify(txData)}`,true,false)
     } catch(e) {
-        lm.log(`Error sending deposits to platform. Confirm platform API is operating. Raw Error: ${e.message}`,true,true)
+        lm.log(`Error sending deposits to platform for TXID: ${tx.txid} . Confirm platform API is operating. Raw Error: ${e.message}`,true,true)
         return
     }
 
