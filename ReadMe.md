@@ -44,8 +44,9 @@ Incoming! will theoretically work with any coin that is a clone or fork of bitco
 - Step 5: [Get your extended public key](#getting-your-extended-public-key-xpub)
 - Step 6: [Generate your signing key pair](#generating-signing-keys)
 - Step 7: [Add your config values](#add-your-config-values)
-- Step 8: [Add notify routes to bitcoind](#additional-walletnotify-and-blocknotify-settings-to-bitcoindconf)
+- Step 8: [Add notify routes to bitcoind](#adding-walletnotify-and-blocknotify-settings-to-bitcoindconf)
 - Step 9: [Generate deposit addresses](#generateaddresses)
+
 *Optional Additional Security and Monitoring Steps*
 - Step 10: [Add chain monitoring to your crontab](#monitoring-chains)
 - Step 11: [Add address auditing to your crontab](#validating-addresses)
