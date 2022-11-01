@@ -99,7 +99,7 @@ const validationTypes = ["hash", "address"];
     (bip = parseInt(config.addressGen.bip))
   );
 
-  const numberToGenerate = endIndex - startIndex;
+  const numberToGenerate = endIndex - startIndex + 1;
   const addresses = await addGen.generate(numberToGenerate, startIndex);
 
   // Build request to platform for addresses within a certain range associated with a public key.
