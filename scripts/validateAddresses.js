@@ -154,7 +154,7 @@ const validationTypes = ["hash", "address"];
 
     if (validationHash !== responseData.hash) {
       lm.log(
-        `Platform ${coin} addresses for index range ${startIndex} to ${endIndex} do not match local addresses when compared by hash. Expected hash ${validationHash} recieved hash ${responseData.hash} .Run address by address comparison to find inconsistencies.`,
+        `Platform ${coin} addresses for index range ${startIndex} to ${endIndex} do not match local addresses when compared by hash. Expected hash ${validationHash} recieved hash ${responseData.hash} . Run address by address comparison to find inconsistencies.`,
         true,
         true
       );
