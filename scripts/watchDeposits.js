@@ -99,6 +99,27 @@ let method = process.argv[3];
     return;
   }
 
+  // Retrieve chain data so we can update chain height.
+  let chainInfo = {};
+
+  try {
+    chainInfo = await requestManager.rpc("getblockchaininfo", []);
+  } catch (e) {
+    lm.log(`RPC server error. Raw Error: ${e.message}`, true, true);
+    return;
+  }
+
+  if (chainInfo.data.result == undefined || chainInfo.data.error != null) {
+    lm.log(
+      `RPC getblockchaininfo malformed. Raw Response: ${JSON.stringify(
+        chainInfo.data
+      )}`,
+      true,
+      true
+    );
+    return;
+  }
+
   // Convert the last deposit block number to a block hash which is required by the lastsinceblock RPC function.
   let hashResponse = {};
 
@@ -156,7 +177,6 @@ let method = process.argv[3];
 
   if (txs.length == 0) {
     lm.log(`No new transactions since block ${data.lastDepositBlock}`);
-    return;
   }
 
   let txData = [];
@@ -228,6 +248,7 @@ let method = process.argv[3];
       config.platform.routes.deposits,
       {
         coin,
+        height: chainInfo.blocks,
         txData,
       }
     );
