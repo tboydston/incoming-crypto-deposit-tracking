@@ -248,7 +248,7 @@ let method = process.argv[3];
       config.platform.routes.deposits,
       {
         coin,
-        height: chainInfo.blocks,
+        chainHeight: chainInfo.blocks,
         txData,
       }
     );
