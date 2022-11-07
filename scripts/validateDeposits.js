@@ -219,7 +219,7 @@ const config = allConfigs[coin];
     );
   } else {
     lm.log(
-      `SUCCESS - Validation of Deposits: Platform ${coin} deposits match wallet for range ${startBlock} to ${endBlock} when compared by address.`,
+      `SUCCESS - Validation of Deposits: Platform ${coin} deposits match wallet for range ${startBlock} to ${endBlock}.`,
       true,
       false
     );
