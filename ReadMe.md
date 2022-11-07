@@ -1,11 +1,10 @@
 # Incoming! Crypto Deposit Tracking
 
-Incoming! is a crypto deposit tracker for Bitcoin and Bitcoin-like( clone coins ) crypto currencies. It generates a string of deterministic addresses, adds these addresses to Bitcoind's wallet as well as to your platform and watches these address for new deposits. When a new deposit is received a notification is sent to your platform as well as to your private Telegram group. 
+Incoming! is a crypto deposit tracker for Bitcoin and Bitcoin-like( clone coins ) crypto currencies. It generates a string of deterministic addresses, adds these addresses to Bitcoind's wallet as well as to your platform and watches these address for new deposits. When a new deposit is received a notification is sent to your platform as well as to your private Telegram group.
 
-Funds can be retrieved using any wallet that supports deterministic address generation and setting a custom [gap limit](https://support.ledger.com/hc/en-us/articles/360010892360-Address-gap-limit?docs=true) or address generation such as Electrum, Trezor( through Electrum ), and Ledger. 
+Funds can be retrieved using any wallet that supports deterministic address generation and setting a custom [gap limit](https://support.ledger.com/hc/en-us/articles/360010892360-Address-gap-limit?docs=true) or address generation such as Electrum, Trezor( through Electrum ), and Ledger.
 
-All addresses are generated using your wallets extended public key so no private keys are used making it impossible for hackers to steal your funds by compromising your wallet watching server. 
-
+All addresses are generated using your wallets extended public key so no private keys are used making it impossible for hackers to steal your funds by compromising your wallet watching server.
 
 ### Features
 
@@ -14,8 +13,7 @@ All addresses are generated using your wallets extended public key so no private
 - Uses only xPub key so no private keys are exposed
 - Signed API request to platform to confirm authenticity of requests
 - Integration with Telegram to notify admin of incoming deposits or chain issues
-- Only makes outgoing request so no need to open additional ports 
-
+- Only makes outgoing request so no need to open additional ports
 
 ## Requirements
 
@@ -24,21 +22,18 @@ All addresses are generated using your wallets extended public key so no private
 - Telegram Bot Id and Group Id to send incoming notifications to
 - Node JS ( >= v16 )
 
-
 ## Where to Run
 
-Incoming! can be run on any secure server that has access to Bitcoind's RPC API and your platform API. In most cases it is run on the same server that contains Bitcoind. The config file contains sensitive data including extended public keys, request signing keys, TG bot tokens, and bitcoind RPC credentials and should be properly secured. If this file is compromised the attacker will not gain control of any funds as no private keys are used but they could cause problems by submitting fake deposits or addresses and sending fake TG notifications as well as gaining access to your full address chain. 
+Incoming! can be run on any secure server that has access to Bitcoind's RPC API and your platform API. In most cases it is run on the same server that contains Bitcoind. The config file contains sensitive data including extended public keys, request signing keys, TG bot tokens, and bitcoind RPC credentials and should be properly secured. If this file is compromised the attacker will not gain control of any funds as no private keys are used but they could cause problems by submitting fake deposits or addresses and sending fake TG notifications as well as gaining access to your full address chain.
 
+## What Coins Are Supported?
 
-## What Coins Are Supported? 
-
-Incoming! will theoretically work with any coin that is a clone or fork of bitcoind and has similar wallet RPC responses and supports walletnotify and blocknotify config settings. Some coins have made variations to these responses so you many need to make some minor adjustments to the script for these coins. It would be better to copy the watchDeposits script and rename it to something like 'watchDeposits-MYCOIN.js' than attempting to add a bunch of conditional statements to the Bitcoin specific watchDeposit script. 
-
+Incoming! will theoretically work with any coin that is a clone or fork of bitcoind and has similar wallet RPC responses and supports walletnotify and blocknotify config settings. Some coins have made variations to these responses so you many need to make some minor adjustments to the script for these coins. It would be better to copy the watchDeposits script and rename it to something like 'watchDeposits-MYCOIN.js' than attempting to add a bunch of conditional statements to the Bitcoin specific watchDeposit script.
 
 ## Setup
 
 - Step 1: [Clone the repository](#clone-the-repository)
-- Step 2: [Install and configure bitcoind](#getting-your-bitcoind-rpc-credentials) 
+- Step 2: [Install and configure bitcoind](#getting-your-bitcoind-rpc-credentials)
 - Step 3: [Configure your platforms API](#platform-api-and-routes)
 - Step 4: [Create your Telegram bot](#creating-your-telegram-bot-and-retrieving-your-chatid)
 - Step 5: [Get your extended public key](#getting-your-extended-public-key-xpub)
@@ -47,145 +42,134 @@ Incoming! will theoretically work with any coin that is a clone or fork of bitco
 - Step 8: [Add notify routes to bitcoind](#adding-walletnotify-and-blocknotify-settings-to-bitcoindconf)
 - Step 9: [Generate deposit addresses](#generateaddresses)
 
-*Optional Additional Security and Monitoring Steps*
+_Optional Additional Security and Monitoring Steps_
+
 - Step 10: [Add chain monitoring to your crontab](#monitoring-chains)
 - Step 11: [Add address auditing to your crontab](#validating-addresses)
 - Step 12: [Add deposit auditing to your crontab](#validate-deposits)
 - Step 13: [Adjust sending wallet gap limit](#sending-funds)
 
-
 ## Scripts
 
-Scripts are located in the /scripts folder and are run with node. 
+Scripts are located in the /scripts folder and are run with node.
 
-``` 
+```
 node [path to script][script] [param1] [param2] [param...]
 ```
 
-When running scripts from crontab or using walletnotify or blocknotify you will need to use the full path to the node executable. If crontab or bitcoind are run by a different user you should make sure node is accessible to that user and that user has write access to the 'logs' and 'data' folders. 
-
+When running scripts from crontab or using walletnotify or blocknotify you will need to use the full path to the node executable. If crontab or bitcoind are run by a different user you should make sure node is accessible to that user and that user has write access to the 'logs' and 'data' folders.
 
 ### generateKeyPair
 
 Generates a RSA key pair used to sign API requests to the platform. Results are outputted to the console. See Also: [Generating Signing Keys](#generating-signing-keys)
 
-*Command*
+_Command_
 
 ```
 node generateSigningKeyPair
 ```
 
-
 ### generateAddresses
 
-Generates a range of deterministic addresses from a coin specific xPub key specified in the config file. Address data is displayed on the console, added to the wallet, and/or sent to the platform depending on the mode option selected. 
+Generates a range of deterministic addresses from a coin specific xPub key specified in the config file. Address data is displayed on the console, added to the wallet, and/or sent to the platform depending on the mode option selected.
 
-*Command*
+_Command_
 
 ```
-node generateAddresses [coin] [mode] [startIndex] [numberToGenerate]
+node generateAddresses [coin] [mode] [startIndex] [endIndex]
 
-// Example 
+// Example
 node generateAddresses BTC add 0 10000
 
 ```
 
-
 #### Options
-- *coin:* Name of the coin as set in the config file. Example: BTC
-- *mode:* show|walletOnly|platformOnly|add
-    - *show* Only print the addresses in console. 
-    - *walletOnly* Display addresses on console and add the addresses to the wallet but not the platform.
-    - *platformOnly* Display addresses on console and add the addresses to the platform but not the wallet.
-    - *add* Display addresses on console and add the addresses to both the wallet and the platform. 
-- *startIndex* Index to start generating addresses from. 
-- *numberToGenerate* Number of addresses to generate from that index. 
 
+- _coin:_ Name of the coin as set in the config file. Example: BTC
+- _mode:_ show|walletOnly|platformOnly|add
+  - _show_ Only print the addresses in console.
+  - _walletOnly_ Display addresses on console and add the addresses to the wallet but not the platform.
+  - _platformOnly_ Display addresses on console and add the addresses to the platform but not the wallet.
+  - _add_ Display addresses on console and add the addresses to both the wallet and the platform.
+- _startIndex_ Index to start generating addresses from.
+- _endIndex_ Index to end generating addresses from.
 
 ### watchDeposits
 
-Checks wallet for new deposits or updates on deposits within confirmations less then or equal to the config value 'notifications.watchUntil'. Incoming deposit information is sent to the specified Telegram group and logged. The block to check for deposits from is saved in the data/lastDepositBlock-[coin].txt file. You can resubmit deposits by resetting this value to one minus the block you would like to check for deposits from. 
+Checks wallet for new deposits or updates on deposits within confirmations less then or equal to the config value 'notifications.watchUntil'. Incoming deposit information is sent to the specified Telegram group and logged. The block to check for deposits from is saved in the data/lastDepositBlock-[coin].txt file. You can resubmit deposits by resetting this value to one minus the block you would like to check for deposits from.
 
-*Command*
+_Command_
 
 ```
-node watchDeposits [coin] 
+node watchDeposits [coin]
 
-// Example 
+// Example
 node watchDeposits BTC
 
 ```
 
-
 #### Options
-- *coin:* Name of the coin as set in the config file. Example: BTC
 
-
+- _coin:_ Name of the coin as set in the config file. Example: BTC
 
 ### watchDeposits
 
 This script can be run directly or periodically from the crontabs file. When run, the script iterates through all coins where monitoring is enabled ( config value: chainMonitoring.enabled ) and confirms their RPC api is running and that they are adding blocks. See [Monitoring Chains](#monitoring-chains) for more details.
 
-*Command*
+_Command_
 
 ```
-node monitorChains 
+node monitorChains
 ```
-
 
 ### validateAddresses
 
 Regenerates address chain and compares addresses to platform addresses to insure that platform addresses have not been tampered with. Inconsistencies will be logged and sent to Telegram directly. See [Validating Addresses](#validating-addresses) for more details.
 
-*Command*
+_Command_
 
 ```
-node validateAddresses [coin] [validationType] [startIndex] [numberToValidate]
+node validateAddresses [coin] [validationType] [startIndex] [endIndex]
 
-// Example 
+// Example
 node validateAddresses BTC hash 0 1000
 
 ```
 
-
 #### Options
-- *coin:* Name of the coin as set in the config file. Example: BTC
-- *validationType:* hash|addresses
-    - *hash* Validate a hash of all addresses. 
-    - *address*  Validate each address one by one.
-- *startIndex* Index to start validating addresses from. 
-- *endIndex* Number of addresses to validate from that index. 
 
-
+- _coin:_ Name of the coin as set in the config file. Example: BTC
+- _validationType:_ hash|addresses
+  - _hash_ Validate a hash of all addresses.
+  - _address_ Validate each address one by one.
+- _startIndex_ Index to start validating addresses from.
+- _endIndex_ Index to stop validating addresses from.
 
 ### validateDeposits
 
 Compares wallet deposits with deposits on the platform. Inconsistencies will be logged and sent to Telegram directly. See [Validate Deposits](#validate-deposits) for more details.
 
-*Command*
+_Command_
 
 ```
 node validateDeposits [coin] [startBlock] [endBlock]
 
-// Example 
+// Example
 node validateDeposits BTC 0 1000000
 
 ```
 
-
 #### Options
-- *coin:* Name of the coin as set in the config file. Example: BTC
-- *startBlock* Block to start validating deposits from.
-- *endBlock* Block to stop validating deposits from.
 
-
+- _coin:_ Name of the coin as set in the config file. Example: BTC
+- _startBlock_ Block to start validating deposits from.
+- _endBlock_ Block to stop validating deposits from.
 
 ## Clone the Repository
 
 ```
-git clone https://github.com/tboydston/incoming-crypto-deposit-tracking.git 
+git clone https://github.com/tboydston/incoming-crypto-deposit-tracking.git
 ```
-
 
 ## Add Your Config Values
 
@@ -195,21 +179,21 @@ Create a config file by copying the config-example.js to config.js
 cp config-example.js config.js
 ```
 
-Open the config.js file and fill in your values. 
+Open the config.js file and fill in your values.
 
 ```
 
-config = { 
+config = {
     "BTC":{
         addressGen:{ // Xpub ( or yPub, zPub, ect. ) and BIP used to generate your deterministic deposit addresses.
             xpub:"YOUR XPUB",
             bip:84
-        },  
-        keyFiles:{ // Files in the /keys folder that contain your public and private signing keys for platform requests. 
+        },
+        keyFiles:{ // Files in the /keys folder that contain your public and private signing keys for platform requests.
             priv:"priv.key",
             pub:"pub.pem"
         },
-        rpc:{ // Bitcoin RPC server address. 
+        rpc:{ // Bitcoin RPC server address.
             address:"http://127.0.0.1",
             port:8332,
             user:"bitcoin",
@@ -228,50 +212,44 @@ config = {
         notifications:{
             unconfirmed:true, // Send a Telegram notification when their is a new unconfirmed transaction.
             confirmed:true, // Send a Telegram notification when their is a new confirmed transaction.
-            watchUntil:4, // Update the platform on a deposit until X confirmations. 
-            when:0, // Not when a certain number of confirmations is reached. Can't be greater than watchConfirmations. 
+            watchUntil:4, // Update the platform on a deposit until X confirmations.
+            when:0, // Not when a certain number of confirmations is reached. Can't be greater than watchConfirmations.
             telegram:{
                 token:"2342342:tgtoken",
                 chatId:"-23423423"
             }
         },
-        chainMonitoring:{ // Check to see if chain is adding new blocks. 
+        chainMonitoring:{ // Check to see if chain is adding new blocks.
             enabled:true,
             expectBlockPeriod:3600 // Maximum number of seconds expected between blocks before a notification is sent to telegram indicating their may be a chain problem.
         },
-        explorer:{ // Explorer URLs are used to create links in TG messages. 
+        explorer:{ // Explorer URLs are used to create links in TG messages.
             address:"https://www.blockchain.com/btc/address/",
             tx:"https://www.blockchain.com/btc/tx/",
             block:"https://www.blockchain.com/btc/block/"
-        }    
+        }
     }
 }
 
 ```
 
-
-
-
 ## Getting your Bitcoind RPC credentials
 
-Bitcoind RPC credentials can be set in the bitcoin.conf file. 
+Bitcoind RPC credentials can be set in the bitcoin.conf file.
 
 Instructions on how to find the .conf file can be found [here](https://github.com/bitcoin/bitcoin/blob/master/doc/bitcoin-conf.md#default-configuration-file-locations)
 
-Currently `rpcuser` and `rpcpassword` are used for authentication. As authentication via username and password will soon be deprecated future version will switch to cookie based authentication. 
+Currently `rpcuser` and `rpcpassword` are used for authentication. As authentication via username and password will soon be deprecated future version will switch to cookie based authentication.
 
-This guide assumes that you are running Incoming! on the same server as Bitcoind. If you are not, you can consider mapping the RPC port from the server where Bitcoind is hosted to the server where Incoming! is hosted. Instruction on how to do this can be found [here](https://linuxize.com/post/how-to-setup-ssh-tunneling/#:~:text=For%20remote%20port%20forwarding%2C%20enter,in%20the%20Source%20Port%20field.). 
+This guide assumes that you are running Incoming! on the same server as Bitcoind. If you are not, you can consider mapping the RPC port from the server where Bitcoind is hosted to the server where Incoming! is hosted. Instruction on how to do this can be found [here](https://linuxize.com/post/how-to-setup-ssh-tunneling/#:~:text=For%20remote%20port%20forwarding%2C%20enter,in%20the%20Source%20Port%20field.).
 
-
-### WARNING 
+### WARNING
 
 Make sure to change the default username and password.
 
-
-
 ## Configuring your Platform API
 
-A functioning example endpoint is provided and may be used as a reference. To run it add the following values to your config.js file. 
+A functioning example endpoint is provided and may be used as a reference. To run it add the following values to your config.js file.
 
 ```
     platform:{
@@ -286,7 +264,7 @@ A functioning example endpoint is provided and may be used as a reference. To ru
     },
 ```
 
-Then run the following command from the project root directory. 
+Then run the following command from the project root directory.
 
 ```
 node example-platform.js
@@ -296,10 +274,9 @@ node example-platform.js
 
 Every request to your platform will be signed using RSA-256 saved as hex and included in the 'Signature' header. The body will also include a nonce before transmission. Every request should be verified against Incoming!'s pubKey to insure it is valid and the nonce checked to insure it is not more then a few seconds old. For further details on the signing and POST requests see the lib/RequestManager.js and lib/signatureManger.js files.
 
-
 ### Routes Overview
 
-You will need to add 4 POST routes to your platform. The actual names of these routes may be changed in the config file. 
+You will need to add 4 POST routes to your platform. The actual names of these routes may be changed in the config file.
 
 ```
 /addresses
@@ -308,15 +285,15 @@ You will need to add 4 POST routes to your platform. The actual names of these r
 /validate/deposits
 ```
 
-All request will be sent with the below request structure. 
+All request will be sent with the below request structure.
 
-*Example Request Body*
+_Example Request Body_
 
 ```
 {"nonce":1655348865573,"data":{REQUEST DATA OBJECT}}
 ```
 
-Incoming! is expecting the following response structure but in most cases it just checks for a '200' HTTP response. 
+Incoming! is expecting the following response structure but in most cases it just checks for a '200' HTTP response.
 
 ```
 {
@@ -326,12 +303,12 @@ Incoming! is expecting the following response structure but in most cases it jus
 }
 ```
 
-
 ### Route: /addresses
 
-Receives an array of addresses. The same addresses may be sent more then once and duplicate addresses should not be allowed. All fields submitted will never be updated and if possible should be to prevent accidental or malicious changes to address db entries. 
+Receives an array of addresses. The same addresses may be sent more then once and duplicate addresses should not be allowed. All fields submitted will never be updated and if possible should be to prevent accidental or malicious changes to address db entries.
 
-*Example Request Data*
+_Example Request Data_
+
 ```
 {
   coin: 'BTC',
@@ -352,15 +329,15 @@ Receives an array of addresses. The same addresses may be sent more then once an
 }
 ```
 
-
 ### Route: /deposit
 
-Receives an array of deposits. The same deposits may be will be sent more then once as new confirmations are received. Txid and address act as a shared key and you should never have duplicate records with the same txid and address. Incoming! will keep sending updates on a deposit as new blocks come in until the number of confirmations reaches the 'notifications.notifyUntil' value. Each time you receive a new update you should update the number of confirmations for that deposit record in the DB. 
+Receives an array of deposits. The same deposits may be will be sent more then once as new confirmations are received. Txid and address act as a shared key and you should never have duplicate records with the same txid and address. Incoming! will keep sending updates on a deposit as new blocks come in until the number of confirmations reaches the 'notifications.notifyUntil' value. Each time you receive a new update you should update the number of confirmations for that deposit record in the DB.
 
-*Example Request Data*
+_Example Request Data_
+
 ```
 {
-    "coin": "BTC", 
+    "coin": "BTC",
     "txData": [{
         "xPubHash": "93f50d6676288093c9f58bec4e57fd65aa12ae70ccd961039dec0ebb080a9868",
         "address": "bc1q46y8dujhsy4wl52m4xlkdarp6uvlj280rktest",
@@ -378,12 +355,12 @@ Receives an array of deposits. The same deposits may be will be sent more then o
     }]
 ```
 
-
 ### Route: /validate/addresses
 
 Receives a request for either a hash of a concated string of address or all addresses withing a certain range. For details on how the address string that is hashed should be generated or how the addresses should be formatted see the getAddressHash and getAddress functions in the example-platform-api.js. See also the [Validate Addresses](#Validating-Addresses) section.
 
-*Example Request Data*
+_Example Request Data_
+
 ```
 {
     "xPubHash": "83f50d6676288093c9f58becbd57fd65a612ae70ced961039dec0ebb080a9869",
@@ -393,9 +370,10 @@ Receives a request for either a hash of a concated string of address or all addr
 }
 ```
 
-*Expected Response*
+_Expected Response_
 
 Hash Request
+
 ```
 {
     status: 'success',
@@ -407,6 +385,7 @@ Hash Request
 ```
 
 Address Request
+
 ```
 {
   status: 'success',
@@ -428,13 +407,12 @@ Address Request
 }
 ```
 
-
-
 ### Route: /validate/deposits
 
 Receives a request for all deposits within a specified block range and returns them in a specific format for validation. For details on how to structure the response see the getDeposits function in the example-platform-api.js file. See also the [Validate Deposits](#Validating-Deposits) section.
 
-*Example Request Data*
+_Example Request Data_
+
 ```
 {
     "xPubHash": "83f50d6676288093c9f58becbd57fd65a612ae70ced961039dec0ebb080a9869",
@@ -443,7 +421,7 @@ Receives a request for all deposits within a specified block range and returns t
 }
 ```
 
-*Expected Response*
+_Expected Response_
 
 ```
 {
@@ -463,49 +441,43 @@ Receives a request for all deposits within a specified block range and returns t
 
 ```
 
-
 ## Creating your Telegram bot and retrieving your chatID
 
-Follow the instructions [here](https://core.telegram.org/bots) to create your bot. 
+Follow the instructions [here](https://core.telegram.org/bots) to create your bot.
 
-Create a group in Telegram that you would like deposit notifications to be sent to and then add your bot. 
+Create a group in Telegram that you would like deposit notifications to be sent to and then add your bot.
 
 Follow one of the solutions [here](https://stackoverflow.com/questions/32423837/telegram-bot-how-to-get-a-group-chat-id) on how to retrieve your ChatId.
 
-Add your bot and chat tokens to the config file. 
-
+Add your bot and chat tokens to the config file.
 
 ## Getting Your Extended Public Key ( xPub )
 
-Trezor: See [Here](https://wiki.trezor.io/Suite_manual:Displaying_account_public_key_(XPUB)#:~:text=Go%20to%20the%20Accounts%20tab,QR%20code%20and%20as%20text.)
+Trezor: See [Here](<https://wiki.trezor.io/Suite_manual:Displaying_account_public_key_(XPUB)#:~:text=Go%20to%20the%20Accounts%20tab,QR%20code%20and%20as%20text.>)
 Electrum: Select "Wallet" from the menu bar and then "Information". The key is in the 'Master Public Key' section.
 Ledger: See [Here](https://support.ledger.com/hc/en-us/articles/360011069619-Extended-public-key?docs=true)
 
+### WARNING
 
-### WARNING 
-
-While funds cannot be stolen if an attacker possesses only your extended public key it can but used to recreated your address chain. This will reveal all of your deposits addresses and make your wallet trackable. Treat this key as a critical secret. 
-
+While funds cannot be stolen if an attacker possesses only your extended public key it can but used to recreated your address chain. This will reveal all of your deposits addresses and make your wallet trackable. Treat this key as a critical secret.
 
 ## Generating Signing Keys
 
-In the 'scripts' folder is a file called generateSigningKeyPair.js. This can be used to generate a public and private key pair. 
+In the 'scripts' folder is a file called generateSigningKeyPair.js. This can be used to generate a public and private key pair.
 
 ```
 node scripts/generateSigningKeyPair.js
 ```
 
-Output will be shown on the console. Copy and paste the private key to file called 'priv.key' in the 'keys' folder. Copy and paste the public key to a file called 'pub.pem' in the keys folder. The public key will be shared with your platform and used to verify the signature of requests to your platform API. 
+Output will be shown on the console. Copy and paste the private key to file called 'priv.key' in the 'keys' folder. Copy and paste the public key to a file called 'pub.pem' in the keys folder. The public key will be shared with your platform and used to verify the signature of requests to your platform API.
 
+### WARNING
 
-### WARNING 
-
-Treat the 'priv.key' as a critical secret. If compromised it could be used to send fake deposits or add fake addresses to your platform. 
-
+Treat the 'priv.key' as a critical secret. If compromised it could be used to send fake deposits or add fake addresses to your platform.
 
 ## Adding walletnotify and blocknotify Settings to Bitcoind.conf
 
-Open your bitcoin.conf and add the following settings. 
+Open your bitcoin.conf and add the following settings.
 
 ```
 walletnotify=node /[PATH TO Incoming!]/scripts/watchDeposits.js BTC walletNotify
@@ -513,87 +485,82 @@ blocknotify=node /[PATH TO Incoming!]/scripts/watchDeposits.js BTC blockNotify
 
 ```
 
-Then restart bitcoind. These settings will call the watchDeposit script after each transaction and register incoming deposits. 
+Then restart bitcoind. These settings will call the watchDeposit script after each transaction and register incoming deposits.
 
-
-### NOTE 
+### NOTE
 
 If the watchDeposits script is not being executed correctly confirm that nodejs is accessible to all users. For linux systems see this [article](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-with-nvm-node-version-manager-on-a-vps).
 
-
 ## Monitoring Chains
 
-Overall Bitcoind is very reliable and properly configure on a properly spec'ed server it can run for months without an issue. That said there are several failure cases for Bitcoind that we need to monitor for. In the first case, for one reason or another Bitcoind may become unresponsive and not answer requests. In the second Bitcoind remains responsive but does not add blocks. This can happen when you have either run out of hard drive space or if you missed a critical update and the new blocks being mined do not pass your versions block validation. The monitorChains script checks for these cases by periodically calling the 'getblockcount' API to see if the chain has updated within an expected period of time defined in your config file. Bitcoin for example, adds a new block on average of every 10 minutes but in some circumstances such as a mining difficulty adjustment this period could extend to 1 or 2 hours. 
+Overall Bitcoind is very reliable and properly configure on a properly spec'ed server it can run for months without an issue. That said there are several failure cases for Bitcoind that we need to monitor for. In the first case, for one reason or another Bitcoind may become unresponsive and not answer requests. In the second Bitcoind remains responsive but does not add blocks. This can happen when you have either run out of hard drive space or if you missed a critical update and the new blocks being mined do not pass your versions block validation. The monitorChains script checks for these cases by periodically calling the 'getblockcount' API to see if the chain has updated within an expected period of time defined in your config file. Bitcoin for example, adds a new block on average of every 10 minutes but in some circumstances such as a mining difficulty adjustment this period could extend to 1 or 2 hours.
 
-In your config file adjust the following settings. 
+In your config file adjust the following settings.
 
 ```
-    chainMonitoring:{ // Check to see if chain is adding new blocks. 
+    chainMonitoring:{ // Check to see if chain is adding new blocks.
         enabled:true,
         expectBlockPeriod:3600 // Maximum number of seconds expected between blocks before a notification is sent to Telegram indicating their may be a chain problem.
     },
 ```
 
-Then in your crontab file add line executing the script as often as you would like. 
+Then in your crontab file add line executing the script as often as you would like.
 
-*Example*
+_Example_
+
 ```
 */10 * * * * /[full path to node]/node /[path to folder]/scripts/monitorChains.js >> /[path to folder]/logs/monitorChains/monitorChainsCron.log
 ```
 
-
-### NOTE 
+### NOTE
 
 Make sure and include the full path to node and that node is executable by crontab.
 
+## Validating Addresses
 
-## Validating Addresses 
+The validateAddresses script audits the addresses associated with a xPub on the remote platform. It does this by regenerating the address chain within a specific range and then comparing them either by hash or one by one to the addresses on the platform. This insures that the addresses available on the platform have not been corrupted or tampered with. Unless you have very few addresses it is best to validate by hash first. If you find inconsistencies then you can validate by address to learn what these inconsistencies are. Inconsistencies are sent as a notification via Telegram and logged in the logs/validateAddress folder.
 
-The validateAddresses script audits the addresses associated with a xPub on the remote platform. It does this by regenerating the address chain within a specific range and then comparing them either by hash or one by one to the addresses on the platform. This insures that the addresses available on the platform have not been corrupted or tampered with. Unless you have very few addresses it is best to validate by hash first. If you find inconsistencies then you can validate by address to learn what these inconsistencies are. Inconsistencies are sent as a notification via Telegram and logged in the logs/validateAddress folder. 
+To understand how your platforms endpoint should format the response data see the 'example-platform-api.js' file for a working example.
 
-To understand how your platforms endpoint should format the response data see the 'example-platform-api.js' file for a working example. 
+This script can be set as cron job to validate addresses periodically.
 
-This script can be set as cron job to validate addresses periodically. 
+_Example_
 
-*Example*
 ```
 * */1 * * * /[full path to node]/node /[path to folder]/scripts/validateAddresses.js BTC hash 0 10000 >> /[path to folder]/logs/validateAddresses/validateAddressesCron.log
 ```
 
+### NOTE
 
-
-### NOTE 
-
-This is not the only measure that should be taken in order to ensure address integrity. You should take additional measure on your platform to insure that addresses are not added under a new xPubHash, modified before being sent to the user, or changed when displayed on the frontend. 
-
+This is not the only measure that should be taken in order to ensure address integrity. You should take additional measure on your platform to insure that addresses are not added under a new xPubHash, modified before being sent to the user, or changed when displayed on the frontend.
 
 ## Validate Deposits
 
 The validateDeposits script audits the deposits associated with a xPub on the remote platform. It does this by requesting all deposits associated with a specific xPub and comparing the results to deposits in the wallet to insure deposits have not been corrupted or tampered with. If any inconsistencies are found details are sent via telegram and saved in the logs/validateDeposits folder. If any deposits are found missing on the platform they can be added by setting the lastBlock in the data/lastBlock-[coin].txt to below the block of the missing TX and running the watchDeposits script.
 
-To understand how your platforms endpoint should format the response data see the 'example-platform-api.js' file for a working example. 
+To understand how your platforms endpoint should format the response data see the 'example-platform-api.js' file for a working example.
 
-This script can be set as cron job to validate deposits periodically. 
+This script can be set as cron job to validate deposits periodically.
 
-*Example*
+_Example_
+
 ```
 * */1 * * * /[full path to node]/node /[path to folder]/scripts/validateDeposits.js BTC 0 1000000 >> /[path to folder]/logs/validateDeposits/validateDepositsCron.log
 ```
 
-
-### NOTE 
+### NOTE
 
 This is not the only measure that should be taken to insure deposit integrity. This method only looks for xPubHash keys that Incoming! knows about. A fake deposit could still be inserted under a different xPubHash
 
 ## Sending Funds
 
-Since Incoming! only tracks public keys you will need an additional wallet, preferable on a secure machine or using a hardware wallet to recover the funds. Incoming! can track as many addresses as bitcoind's wallet can track which has been [tested](https://bitcoin.stackexchange.com/questions/24947/what-is-the-maximum-of-receive-addresses-the-default-wallet-can-handle) into the millions. It is important that you keep track of how many addresses you add to Incoming! so you can adjust your sending wallet to make sure it is tracking at least that many addresses. On some wallets you can do this by adjusting the gap limit ([moreInfoHere](https://support.ledger.com/hc/en-us/articles/360010892360-Address-gap-limit?docs=true)), others allow you to pre-generate addresses.  
+Since Incoming! only tracks public keys you will need an additional wallet, preferable on a secure machine or using a hardware wallet to recover the funds. Incoming! can track as many addresses as bitcoind's wallet can track which has been [tested](https://bitcoin.stackexchange.com/questions/24947/what-is-the-maximum-of-receive-addresses-the-default-wallet-can-handle) into the millions. It is important that you keep track of how many addresses you add to Incoming! so you can adjust your sending wallet to make sure it is tracking at least that many addresses. On some wallets you can do this by adjusting the gap limit ([moreInfoHere](https://support.ledger.com/hc/en-us/articles/360010892360-Address-gap-limit?docs=true)), others allow you to pre-generate addresses.
 
 ### Adjusting Gap Limit on Adding Addresses to Popular Wallets
+
 - [Electrum, also works with electrum Trezor wallets](https://electrum.readthedocs.io/en/latest/faq.html#what-is-the-gap-limit)
 - [Ledger](https://support.ledger.com/hc/en-us/articles/360010892360-Address-gap-limit?docs=true)
 
-### Limits 
+### Limits
 
 Both Electrum and Ledger require sending your addresses to their servers for tracking ( Electrum is a distributed service so 'their servers' in this context is whatever node you connect to. ). This causes 2 issues. The firsts is that it tells a 3rd party what addresses belong to you which reduces anonymity. The second is that this 3rd party is essentially offering you a free service with no guarantee of performance. So if you ask them to monitor millions of addresses you may experience performance issues or tracking failures.
-
