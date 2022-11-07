@@ -205,13 +205,13 @@ const validationTypes = ["hash", "address"];
 
     if (inconsistencies.length > 0) {
       lm.log(
-        `Platform ${coin} deposit address inconsistencies found for index range ${startIndex} to ${endIndex}. Inconsistencies: ${inconsistencies}`,
+        `FAIL - Validation of Addresses: Platform ${coin} deposit address inconsistencies found for index range ${startIndex} to ${endIndex}. Inconsistencies: ${inconsistencies}`,
         true,
         true
       );
     } else {
       lm.log(
-        `Platform ${coin} deposit addresses match deterministic addresses for range ${startIndex} to ${endIndex} when compared by address.`,
+        `SUCCESS - Validation of Addresses: Platform ${coin} deposit addresses match deterministic addresses for range ${startIndex} to ${endIndex} when compared by address.`,
         true,
         false
       );
