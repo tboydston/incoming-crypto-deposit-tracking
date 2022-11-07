@@ -47,7 +47,8 @@ _Optional Additional Security and Monitoring Steps_
 - Step 10: [Add chain monitoring to your crontab](#monitoring-chains)
 - Step 11: [Add address auditing to your crontab](#validating-addresses)
 - Step 12: [Add deposit auditing to your crontab](#validate-deposits)
-- Step 13: [Adjust sending wallet gap limit](#sending-funds)
+- Step 13: [Crediting deposits on your platform](#crediting-deposits)
+- Step 14: [Adjust sending wallet gap limit](#sending-funds)
 
 ## Scripts
 
@@ -112,7 +113,7 @@ node watchDeposits BTC
 
 - _coin:_ Name of the coin as set in the config file. Example: BTC
 
-### watchDeposits
+### monitorChains
 
 This script can be run directly or periodically from the crontabs file. When run, the script iterates through all coins where monitoring is enabled ( config value: chainMonitoring.enabled ) and confirms their RPC api is running and that they are adding blocks. See [Monitoring Chains](#monitoring-chains) for more details.
 
@@ -338,6 +339,7 @@ _Example Request Data_
 ```
 {
     "coin": "BTC",
+    "chainHeight":739526
     "txData": [{
         "xPubHash": "93f50d6676288093c9f58bec4e57fd65aa12ae70ccd961039dec0ebb080a9868",
         "address": "bc1q46y8dujhsy4wl52m4xlkdarp6uvlj280rktest",
@@ -551,6 +553,12 @@ _Example_
 ### NOTE
 
 This is not the only measure that should be taken to insure deposit integrity. This method only looks for xPubHash keys that Incoming! knows about. A fake deposit could still be inserted under a different xPubHash
+
+## Crediting Deposits
+
+Each chain has a different amount of confirmations that are required before a transaction may be considered immutable. For PoW chains this is generally related to the amount of hashing power required to conduct a [51% attack](https://academy.binance.com/en/articles/what-is-a-51-percent-attack) on the network. You will need to do some research about the suggested number of confirmations for each of the chains you intend to receive deposits on. This number may need to be updated if a network is under attack or if there is a significant change in hashing power available on the network that may make it stronger of more vulnerable.
+
+When implementing fund crediting on your platform you should set 'notifications.watchUntil' in the config file higher then the number of confirmations you require to credit funds. Incoming! will continue to notify your platform about a deposit until this it has received the number of confirmations specified in 'notifications.watchUntil'. You should ONLY update confirmations for a specific transaction when data about that transaction is received in the 'txData' section of the request to your platform until the number of confirmations in the 'txData' reaches the number of confirmations you require to credit the transaction. After a transaction is confirmed you can use the 'chainHeight' key sent to your deposits API with each new block to calculate how many total confirmations a transaction has received. The reason for this is that transactions in the 'txData' key of the data object are confirmed to be in the wallet. If you no longer see the transaction here and the transaction is has not received the necessary number of confirmations to become immutable it may belong to an ['orphan' or 'stale' block](https://academy.binance.com/en/glossary/orphan-block) that was created maliciously by a 51% attack or in the normal course of blockchain operation by 2 miners submitting valid blocks at the same time.
 
 ## Sending Funds
 
