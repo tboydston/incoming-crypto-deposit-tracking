@@ -154,13 +154,13 @@ const validationTypes = ["hash", "address"];
 
     if (validationHash !== responseData.hash) {
       lm.log(
-        `Platform ${coin} addresses for index range ${startIndex} to ${endIndex} do not match local addresses when compared by hash. Expected hash ${validationHash} recieved hash ${responseData.hash} . Run address by address comparison to find inconsistencies.`,
+        `FAIL - Validation of Addresses by Hash: Platform ${coin} addresses for index range ${startIndex} to ${endIndex} do not match local addresses when compared by hash. Expected hash ${validationHash} recieved hash ${responseData.hash} . Run address by address comparison to find inconsistencies.`,
         true,
         true
       );
     } else {
       lm.log(
-        `Platform ${coin} deposit addresses match deterministic addresses for range ${startIndex} to ${endIndex} when compared by hash`,
+        `SUCCESS - Validation of Addresses by Hash: Platform ${coin} deposit addresses match deterministic addresses for range ${startIndex} to ${endIndex} when compared by hash`,
         true,
         false
       );
