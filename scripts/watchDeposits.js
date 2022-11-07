@@ -142,10 +142,6 @@ let method = process.argv[3];
   }
 
   if (txResponse.data.result.transactions == undefined) {
-    return;
-  }
-
-  if (txResponse.data.result.transactions == undefined) {
     lm.log(
       `RPC listsinceblock malformed. Raw Response: ${JSON.stringify(
         txResponse.data
