@@ -22,5 +22,18 @@
     "express": "^4.18.1",
     "hdaddressgenerator": "^1.0.7",
     "slimbot": "^5.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.31.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jest": "^27.2.1",
+    "eslint-plugin-n": "^15.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-spellcheck": "^0.0.20",
+    "jest": "^29.3.1"
   }
 }

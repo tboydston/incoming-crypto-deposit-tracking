@@ -214,7 +214,7 @@ config = {
             unconfirmed:true, // Send a Telegram notification when their is a new unconfirmed transaction.
             confirmed:true, // Send a Telegram notification when their is a new confirmed transaction.
             watchUntil:4, // Update the platform on a deposit until X confirmations.
-            when:0, // Not when a certain number of confirmations is reached. Can't be greater than watchConfirmations.
+            when:0, // Send deposit notification when a certain number of confirmations is reached. Can't be greater than watchConfirmations.
             telegram:{
                 token:"2342342:tgtoken",
                 chatId:"-23423423"
