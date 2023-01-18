@@ -77,7 +77,7 @@ describe("Library validationManager tests", () => {
       const result = await validate.options("generateAddresses", args);
 
       expect(result.mode).toBe("show");
-      expect(result.config).toBe("./config.js");
+      expect(result.config).toBe("../config.js");
     });
   });
   describe("Function config() tests", () => {
