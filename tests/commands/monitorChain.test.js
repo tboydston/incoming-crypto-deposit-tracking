@@ -2,7 +2,7 @@ const fs = require("fs");
 
 const monitorChain = require("../../commands/monitorChain");
 
-const configs = require("../config.test");
+const configs = require("../configTest");
 
 const config = configs.BTC;
 

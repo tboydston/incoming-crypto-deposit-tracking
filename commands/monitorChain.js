@@ -18,9 +18,10 @@ module.exports = async (options, config, requestManager, logManager) => {
   }
 
   // Check if default file path is overridden.
-  if (config.data.paths.lastBlock !== undefined) {
+  try {
     dataPath = config.data.paths.lastBlock;
-  }
+    /* eslint-disable-next-line */
+  } catch {}
 
   // Check to see if lastBlock file exists for coin if not create it at 0.
   try {

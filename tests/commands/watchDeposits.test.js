@@ -2,7 +2,7 @@ const fs = require("fs");
 
 const watch = require("../../commands/watchDeposits");
 
-const configs = require("../config.test");
+const configs = require("../configTest");
 
 const config = configs.BTC;
 
@@ -70,6 +70,7 @@ beforeAll(() => {
   fs.writeFileSync(`tests/data/lastDepositWalletNotify-BTC.txt`, `0`);
   fs.writeFileSync(`tests/data/lastDepositBlockNotify-BTC.txt`, `0`);
   fs.writeFileSync(`tests/data/lastDepositNoUpdate-BTC.txt`, `0`);
+  fs.writeFileSync(`tests/data/lastDepositNotifyNone-BTC.txt`, `0`);
 });
 
 beforeEach(() => {
@@ -424,6 +425,53 @@ describe("Command watchDeposits tests", () => {
     localConfig.data = {};
     localConfig.data.paths = {};
     localConfig.data.paths.lastDepositBlock = `tests/data/lastDepositBlockNotify-BTC.txt`;
+    localConfig.notifications.notifyTgOnConfirmations = [1];
+
+    expect(async () => {
+      await watch(
+        {
+          coin: "BTC",
+          method: "blockNotify",
+        },
+        localConfig,
+        mockRequestManager,
+        mockLogManager
+      );
+      expect(mockRequestManager.post).toHaveBeenCalledTimes(1);
+      expect(
+        mockRequestManager.post.mock.calls[0][1].txData[0].confirmations
+      ).toBe(1);
+      expect(mockRequestManager.post.mock.calls[0][1].txData.length).toBe(1);
+      expect(mockLogManager.log.mock.calls.length).toBe(1);
+      expect(
+        (mockLogManager.log.mock.calls[0][0].match(/amount/g) || []).length
+      ).toBe(1);
+      expect(
+        fs.readFileSync(localConfig.data.paths.lastDepositBlock).toString()
+      ).toBe("0");
+    }).not.toThrowError();
+  });
+  test("Should NOT send notification to Telegram when method is 'notifyNone'", async () => {
+    const mockRequestManager = new MockRequestManager({
+      getblockhash: "validBlockHash",
+      listsinceblock: {
+        transactions: [
+          {
+            blockheight: 10,
+            txid: "txid1",
+            address: "add1",
+            amount: 10,
+            confirmations: 1,
+            category: "receive",
+          },
+        ],
+      },
+      getblockchaininfo: { blocks: 11 },
+    });
+    const localConfig = structuredClone(config);
+    localConfig.data = {};
+    localConfig.data.paths = {};
+    localConfig.data.paths.lastDepositBlock = `tests/data/lastDepositNotifyNone-BTC.txt`;
     localConfig.notifications.notifyTgOnConfirmations = [1];
 
     expect(async () => {

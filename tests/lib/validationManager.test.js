@@ -88,16 +88,16 @@ describe("Library validationManager tests", () => {
     });
     test("Should throw error when coin config doesn't exist.", () => {
       expect(async () => {
-        await validate.config("../tests/config.test.js", "INVALID");
+        await validate.config("../tests/configTest.js", "INVALID");
       }).rejects.toThrowError(`Error loading config for coin 'INVALID'.`);
     });
     test("Should throw error when pub key path doesn't exist.", () => {
       expect(async () => {
-        await validate.config("../tests/config.invalid.test.js", "BTC");
+        await validate.config("../tests/configInvalidTest.js", "BTC");
       }).rejects.toThrowError(`invalid-pub.pem`);
     });
     test("Should load keys in tests/keys folder into config object.", async () => {
-      const config = await validate.config("../tests/config.test.js", "BTC");
+      const config = await validate.config("../tests/configTest.js", "BTC");
       expect(config.keys.pub.toString()).toMatch(testPubKey.toString());
       expect(config.keys.priv.toString()).toMatch(testPrivKey.toString());
     });

@@ -2,7 +2,7 @@ const fs = require("fs");
 
 const validate = require("../../commands/validateDeposits");
 
-const configs = require("../config.test");
+const configs = require("../configTest");
 
 const config = configs.BTC;
 
@@ -189,9 +189,6 @@ describe("Command validateDeposits tests", () => {
     const invalidWalletTx = structuredClone(validWalletTx);
 
     invalidWalletTx[0].amount = 200;
-
-    console.log(validPlatformTxs.txid1.add1, invalidWalletTx[0].amount);
-
     const postResponseObj = {
       data: {
         data: {
@@ -228,8 +225,6 @@ describe("Command validateDeposits tests", () => {
     const invalidWalletTx = structuredClone(validWalletTx);
 
     invalidWalletTx[3].amount = 200;
-
-    console.log(validPlatformTxs.txid1.add1, invalidWalletTx[0].amount);
 
     const postResponseObj = {
       data: {

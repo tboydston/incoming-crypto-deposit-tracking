@@ -119,7 +119,8 @@ module.exports = async (options, config, requestManager, logManager) => {
       config.notifications.notifyTgOnConfirmations.includes(tx.confirmations) &&
       ((method === "walletNotify" && tx.confirmations <= 1) ||
         (method === "blockNotify" && tx.confirmations > 1) ||
-        method === "notifyAll")
+        method === "notifyAll") &&
+      method !== "notifyNone"
     ) {
       depositString += `Deposit ${noteNumber}
         Address: [${tx.address}](${config.explorer.address}${tx.address})

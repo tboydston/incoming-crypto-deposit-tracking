@@ -1,6 +1,6 @@
 const { generateKeyPairSync } = require("crypto");
 
-module.exports = async (options, config, requestManager, logManager) => {
+module.exports = async () => {
   const { publicKey, privateKey } = generateKeyPairSync("rsa", {
     modulusLength: 4096, // the length of your key in bits
     publicKeyEncoding: {
@@ -13,9 +13,9 @@ module.exports = async (options, config, requestManager, logManager) => {
     },
   });
 
-  logManager.log(publicKey);
-  logManager.log("");
-  logManager.log(privateKey);
+  console.log(publicKey);
+  console.log("");
+  console.log(privateKey);
 
   return {
     publicKey,

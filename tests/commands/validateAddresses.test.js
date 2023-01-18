@@ -3,7 +3,7 @@ const crypto = require("crypto");
 
 const validate = require("../../commands/validateAddresses");
 
-const configs = require("../config.test");
+const configs = require("../configTest");
 
 const config = configs.BTC;
 

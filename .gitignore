@@ -6,6 +6,8 @@ test/exampleDeposits.js
 
 node_modules
 config.js
+config-live.js
+
 
 !.gitkeep
 
