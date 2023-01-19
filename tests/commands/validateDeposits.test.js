@@ -149,7 +149,7 @@ describe("Command validateDeposits tests", () => {
     }).rejects.toThrowError(`SUCCESS`);
   });
   test("Should throw fail message because platform deposits don't match wallet deposits.", async () => {
-    const invalidPlatformTxs = structuredClone(validPlatformTxs);
+    const invalidPlatformTxs = JSON.parse(JSON.stringify(validPlatformTxs));
 
     invalidPlatformTxs.txid1.add1 = 200;
 
@@ -186,7 +186,7 @@ describe("Command validateDeposits tests", () => {
     }).rejects.toThrowError(`10 BTC | Platform Amount: 200 BTC`);
   });
   test("Should throw fail message because wallet deposits don't match platform deposits.", async () => {
-    const invalidWalletTx = structuredClone(validWalletTx);
+    const invalidWalletTx = JSON.parse(JSON.stringify(validWalletTx));
 
     invalidWalletTx[0].amount = 200;
     const postResponseObj = {
@@ -222,7 +222,7 @@ describe("Command validateDeposits tests", () => {
     }).rejects.toThrowError(`Wallet Amount: 200 BTC | Platform Amount: 10 BTC`);
   });
   test("Should throw fail message because wallet deposits don't match platform deposits in send to many tx.", async () => {
-    const invalidWalletTx = structuredClone(validWalletTx);
+    const invalidWalletTx = JSON.parse(JSON.stringify(validWalletTx));
 
     invalidWalletTx[3].amount = 200;
 
