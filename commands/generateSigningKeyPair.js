@@ -1,5 +1,7 @@
 const { generateKeyPairSync } = require("crypto");
-
+/*
+ * Generates a RSA key pair used to sign API requests to the platform. Results are outputted to the console.
+ */
 module.exports = async () => {
   const { publicKey, privateKey } = generateKeyPairSync("rsa", {
     modulusLength: 4096, // the length of your key in bits

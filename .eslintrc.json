@@ -32,7 +32,8 @@
           "xpub",
           "txid",
           "tx",
-          "bitcoind"
+          "bitcoind",
+          "bool"
         ],
         "skipIfMatch": ["http://[^s]*", "^[-\\w]+/[-\\w\\.]+$"],
         "skipWordIfMatch": ["^foobar.*$"],

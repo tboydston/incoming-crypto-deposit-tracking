@@ -3,7 +3,10 @@ const crypto = require("crypto");
 
 const LogError = require("../lib/LogError");
 
-module.exports = async (options, config, requestManager, logManager) => {
+/*
+ *   Regenerates address chain and compares addresses to platform addresses to insure that platform addresses have not been tampered with. Inconsistencies will be logged and sent to Telegram directly.
+ */
+module.exports = async (options, config, requestManager) => {
   const { coin } = options;
   const { validationType } = options;
   const { startIndex } = options;

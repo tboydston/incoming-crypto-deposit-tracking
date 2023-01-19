@@ -2,7 +2,7 @@ const fs = require("fs");
 const LogError = require("../lib/LogError");
 
 /**
- * Generate deterministic addresses and add them to a local Bitcoind like wallet and remote platform API.
+ * Designed to be run periodically via crontab. Confirms RPC api's are functional and blocks are updating
  */
 /* eslint-disable-next-line no-unused-vars */
 module.exports = async (options, config, requestManager, logManager) => {

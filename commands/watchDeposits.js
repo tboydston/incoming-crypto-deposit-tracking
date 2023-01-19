@@ -3,6 +3,9 @@ const fs = require("fs");
 
 const LogError = require("../lib/LogError");
 
+/*
+ *   Compares wallet deposits with deposits on the platform. Inconsistencies will be logged and sent to Telegram directly.
+ */
 module.exports = async (options, config, requestManager, logManager) => {
   const { coin } = options;
   const { method } = options;

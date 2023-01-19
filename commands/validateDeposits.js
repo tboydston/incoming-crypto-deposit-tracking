@@ -2,7 +2,7 @@ const crypto = require("crypto");
 
 const LogError = require("../lib/LogError");
 
-module.exports = async (options, config, requestManager, logManager) => {
+module.exports = async (options, config, requestManager) => {
   const { coin } = options;
   const { startBlock } = options;
   const { endBlock } = options;

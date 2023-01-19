@@ -2,6 +2,9 @@ const validate = require("../lib/validationManager");
 
 const { validations } = validate;
 
+/*
+ *  Display general and command specific help messages.
+ */
 module.exports = async (command) => {
   if (validations.commands[command] === undefined) {
     console.log(
