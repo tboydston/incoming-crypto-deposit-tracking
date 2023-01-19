@@ -1,6 +1,7 @@
 data/**
 keys/**
 logs/**
+tests/data/**
 
 test/exampleDeposits.js
 

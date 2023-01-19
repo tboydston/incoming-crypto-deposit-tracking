@@ -24,15 +24,11 @@ All addresses are generated using your wallets extended public key so no private
 
 ## Where to Run
 
-Incoming! can be run on any secure server that has access to Bitcoind's RPC API and your platform API. In most cases it is run on the same server that contains Bitcoind. 
-
-### Security Note
-
-The config file contains sensitive data including extended public keys, request signing keys, Telegram bot tokens, and Bitcoind RPC credentials. If this file is compromised the attacker will not gain control of any funds as no private keys are used but they could cause other problems by submitting fake deposits, adding addresses not belonging to your wallet to your platform, sending fake Telegram notifications, or expose all your deposit addresses.
+Incoming! can be run on any secure server that has access to Bitcoind's RPC API and your platform API. In most cases it is run on the same server that contains Bitcoind.
 
 ## What Coins Are Supported?
 
-Incoming! will theoretically work with any coin that is a clone or fork of bitcoind and has similar wallet RPC responses and supports walletnotify and blocknotify config settings. Some coins have made variations to these responses so you many need to make some minor adjustments to the command files for these coins. 
+Incoming! will theoretically work with any coin that is a clone or fork of bitcoind and has similar wallet RPC responses and supports walletnotify and blocknotify config settings. Some coins have made variations to these responses so you many need to make some minor adjustments to the command files for these coins.
 
 ## Setup
 
@@ -56,49 +52,53 @@ _Optional Additional Security and Monitoring Steps_
 
 ## CLI
 
-Commands are run through the cli.js file in the projects root directory. 
+Commands are run through the cli.js file in the projects root directory.
+
+_Usage_
 
 ```
 node cli.js <command> [option1]=[option1value] [option2]=[option2value]
 ```
 
+A config file can be specified using the `config=[filePath]` option. If no config is specified a config.js file in the root directory will be loaded by default.
+
 When running commands from crontab or using walletnotify or blocknotify you will need to use the full path to the node executable. If crontab or bitcoind are run by a different user you should make sure node is accessible to that user and that user has write access to the 'logs' and 'data' folders.
 
 ## Commands
 
-### help 
+### Command: help
 
-To see a list of all available commands run the 'help' command. To see help for a specific command follow help with the name of the command. 
+To see a list of all available commands run the 'help' command. To see help for a specific command follow help with the name of the command.
 
 ```
 node cli.js help
 
-//or 
+//or
 
 node cli.js help <command>
 ```
 
-### generateKeyPair
+### Command: generateKeyPair
 
 Generates a RSA key pair used to sign API requests to the platform. Results are outputted to the console. See Also: [Generating Signing Keys](#generating-signing-keys)
 
-_Command_
+_Usage_
 
 ```
 node cli.js generateSigningKeyPair
 ```
 
-### generateAddresses
+### Command: generateAddresses
 
 Generates a range of deterministic addresses from a coin specific xPub key specified in the config file. Address data is displayed on the console, added to the wallet, and/or sent to the platform depending on the mode option selected.
 
-_Command_
+_Usage_
 
 ```
-node generateAddresses [coin] [mode] [startIndex] [endIndex]
+node cli.js generateAddresses coin=[coin] mode=[mode] startIndex=[startIndex] endIndex=[endIndex]
 
 // Example
-node generateAddresses BTC add 0 10000
+node cli.js generateAddresses coin=BTC mode=add startIndex=0 endIndex=10000
 
 ```
 
@@ -113,17 +113,17 @@ node generateAddresses BTC add 0 10000
 - _startIndex_ Index to start generating addresses from.
 - _endIndex_ Index to end generating addresses from.
 
-### watchDeposits
+### Command: watchDeposits
 
 Checks wallet for new deposits or updates on deposits within confirmations less then or equal to the config value 'notifications.watchUntil'. Incoming deposit information is sent to the specified Telegram group and logged. The block to check for deposits from is saved in the data/lastDepositBlock-[coin].txt file. You can resubmit deposits by resetting this value to one minus the block you would like to check for deposits from.
 
-_Command_
+_Usage_
 
 ```
-node watchDeposits [coin]
+node cli.js watchDeposits coin=[coin]
 
 // Example
-node watchDeposits BTC
+node cli.js watchDeposits coin=BTC
 
 ```
 
@@ -131,27 +131,31 @@ node watchDeposits BTC
 
 - _coin:_ Name of the coin as set in the config file. Example: BTC
 
-### monitorChains
+### Command: monitorChain
 
-This script can be run directly or periodically from the crontabs file. When run, the script iterates through all coins where monitoring is enabled ( config value: chainMonitoring.enabled ) and confirms their RPC api is running and that they are adding blocks. See [Monitoring Chains](#monitoring-chains) for more details.
+This command can be run directly or periodically from the crontabs file. When run, the command iterates through all coins where monitoring is enabled ( config value: chainMonitoring.enabled ) and confirms their RPC api is running and that they are adding blocks. See [Monitoring Chains](#monitoring-chains) for more details.
 
-_Command_
+_Usage_
 
 ```
-node monitorChains
+node cli.js monitorChain coin=[coin]
+
+// Example
+node cli.js monitorChain coin=BTC
+
 ```
 
-### validateAddresses
+### Command: validateAddresses
 
 Regenerates address chain and compares addresses to platform addresses to insure that platform addresses have not been tampered with. Inconsistencies will be logged and sent to Telegram directly. See [Validating Addresses](#validating-addresses) for more details.
 
-_Command_
+_Usage_
 
 ```
-node validateAddresses [coin] [validationType] [startIndex] [endIndex]
+node cli.js validateAddresses [coin] [validationType] [startIndex] [endIndex]
 
 // Example
-node validateAddresses BTC hash 0 1000
+node cli.js validateAddresses coin=BTC validationType=hash startIndex=0 endIndex=1000
 
 ```
 
@@ -164,17 +168,17 @@ node validateAddresses BTC hash 0 1000
 - _startIndex_ Index to start validating addresses from.
 - _endIndex_ Index to stop validating addresses from.
 
-### validateDeposits
+### Command: validateDeposits
 
 Compares wallet deposits with deposits on the platform. Inconsistencies will be logged and sent to Telegram directly. See [Validate Deposits](#validate-deposits) for more details.
 
-_Command_
+_Usage_
 
 ```
-node validateDeposits [coin] [startBlock] [endBlock]
+node cli.js validateDeposits [coin] [startBlock] [endBlock]
 
 // Example
-node validateDeposits BTC 0 1000000
+node cli.js validateDeposits coin=BTC startBlock=0 endBlock=1000000
 
 ```
 
@@ -229,8 +233,7 @@ config = {
             }
         },
         notifications:{
-            unconfirmed:true, // Send a Telegram notification when their is a new unconfirmed transaction.
-            confirmed:true, // Send a Telegram notification when their is a new confirmed transaction.
+            notifyTgOnConfirmations: [0, 1], // Send notification to Telegram on specified confirmations numbers.
             watchUntil:4, // Update the platform on a deposit until X confirmations.
             when:0, // Send deposit notification when a certain number of confirmations is reached. Can't be greater than watchConfirmations.
             telegram:{
@@ -251,6 +254,12 @@ config = {
 }
 
 ```
+
+A config file can be specified using the `config=[filePath]` option. If no config is specified a config.js file in the root directory will be loaded by default.
+
+### Security Note
+
+The config file contains sensitive data including extended public keys, request signing keys, Telegram bot tokens, and Bitcoind RPC credentials. If this file is compromised the attacker will not gain control of any funds as no private keys are used but they could cause other problems by submitting fake deposits, adding addresses not belonging to your wallet to your platform, sending fake Telegram notifications, or expose all your deposit addresses.
 
 ## Getting your Bitcoind RPC credentials
 
@@ -483,13 +492,13 @@ While funds cannot be stolen if an attacker possesses only your extended public 
 
 ## Generating Signing Keys
 
-In the 'scripts' folder is a file called generateSigningKeyPair.js. This can be used to generate a public and private key pair.
+The command generateSigningKeyPair can be used to generate a public and private key pair.
 
 ```
-node scripts/generateSigningKeyPair.js
+node cli.js generateSigningKeyPair
 ```
 
-Output will be shown on the console. Copy and paste the private key to file called 'priv.key' in the 'keys' folder. Copy and paste the public key to a file called 'pub.pem' in the keys folder. The public key will be shared with your platform and used to verify the signature of requests to your platform API.
+Output will be shown on the console. Copy and paste the private key to a file called 'priv.key' in the 'keys' folder. Copy and paste the public key to a file called 'pub.pem' in the keys folder. The public key should be shared with your platform and used to verify the signature of requests to your platform API.
 
 ### WARNING
 
@@ -500,20 +509,20 @@ Treat the 'priv.key' as a critical secret. If compromised it could be used to se
 Open your bitcoin.conf and add the following settings.
 
 ```
-walletnotify=node /[PATH TO Incoming!]/scripts/watchDeposits.js BTC walletNotify
-blocknotify=node /[PATH TO Incoming!]/scripts/watchDeposits.js BTC blockNotify
+walletnotify=node /[PATH TO Incoming!]/cli.js watchDeposits.js coin=BTC method=walletNotify
+blocknotify=node /[PATH TO Incoming!]/cli.js watchDeposits.js coin=BTC method=blockNotify
 
 ```
 
-Then restart bitcoind. These settings will call the watchDeposit script after each transaction and register incoming deposits.
+Then restart bitcoind. These settings will call the watchDeposit command after each transaction and register incoming deposits.
 
 ### NOTE
 
-If the watchDeposits script is not being executed correctly confirm that nodejs is accessible to all users. For linux systems see this [article](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-with-nvm-node-version-manager-on-a-vps).
+If the watchDeposits command is not being executed correctly confirm that nodejs is accessible to all users. For linux systems see this [article](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-with-nvm-node-version-manager-on-a-vps).
 
 ## Monitoring Chains
 
-Overall Bitcoind is very reliable and properly configure on a properly spec'ed server it can run for months without an issue. That said there are several failure cases for Bitcoind that we need to monitor for. In the first case, for one reason or another Bitcoind may become unresponsive and not answer requests. In the second Bitcoind remains responsive but does not add blocks. This can happen when you have either run out of hard drive space or if you missed a critical update and the new blocks being mined do not pass your versions block validation. The monitorChains script checks for these cases by periodically calling the 'getblockcount' API to see if the chain has updated within an expected period of time defined in your config file. Bitcoin for example, adds a new block on average of every 10 minutes but in some circumstances such as a mining difficulty adjustment this period could extend to 1 or 2 hours.
+Overall Bitcoind is very reliable and properly configure on a properly spec'ed server it can run for months without an issue. That said there are several failure cases for Bitcoind that we need to monitor for. In the first case, for one reason or another Bitcoind may become unresponsive and not answer requests. In the second Bitcoind remains responsive but does not add blocks. This can happen when you have either run out of hard drive space or if you missed a critical update and the new blocks being mined do not pass your versions block validation. The monitorChain command checks for these cases by periodically calling the 'getblockcount' API to see if the chain has updated within an expected period of time defined in your config file. Bitcoin for example, adds a new block an average of every 10 minutes but in some circumstances, such as a mining difficulty adjustment this period could extend to 1 or 2 hours.
 
 In your config file adjust the following settings.
 
@@ -524,12 +533,12 @@ In your config file adjust the following settings.
     },
 ```
 
-Then in your crontab file add line executing the script as often as you would like.
+Then in your crontab file add line executing the command as often as you would like.
 
 _Example_
 
 ```
-*/10 * * * * /[full path to node]/node /[path to folder]/scripts/monitorChains.js >> /[path to folder]/logs/monitorChains/monitorChainsCron.log
+*/10 * * * * /[full path to node]/node /[path to folder]/cli.js monitorChains coin=BTC >> /[path to folder]/logs/monitorChains/monitorChainsCron.log
 ```
 
 ### NOTE
@@ -538,16 +547,16 @@ Make sure and include the full path to node and that node is executable by cront
 
 ## Validating Addresses
 
-The validateAddresses script audits the addresses associated with a xPub on the remote platform. It does this by regenerating the address chain within a specific range and then comparing them either by hash or one by one to the addresses on the platform. This insures that the addresses available on the platform have not been corrupted or tampered with. Unless you have very few addresses it is best to validate by hash first. If you find inconsistencies then you can validate by address to learn what these inconsistencies are. Inconsistencies are sent as a notification via Telegram and logged in the logs/validateAddress folder.
+The validateAddresses command audits the addresses associated with a xPub on the remote platform. It does this by regenerating the address chain within a specific range and then comparing them either by hash or one by one to the addresses on the platform. This insures that the addresses available on the platform have not been corrupted or tampered with. Unless you have very few addresses it is best to validate by hash first. If you find inconsistencies then you can validate by address to learn what these inconsistencies are. Inconsistencies are sent as a notification via Telegram and logged in the logs/validateAddress folder.
 
 To understand how your platforms endpoint should format the response data see the 'example-platform-api.js' file for a working example.
 
-This script can be set as cron job to validate addresses periodically.
+This command can be set as cron job to validate addresses periodically.
 
 _Example_
 
 ```
-* */1 * * * /[full path to node]/node /[path to folder]/scripts/validateAddresses.js BTC hash 0 10000 >> /[path to folder]/logs/validateAddresses/validateAddressesCron.log
+* */1 * * * /[full path to node]/node /[path to folder]/cli.js validateAddresses coin=BTC validationType=hash startIndex=0 endIndex=10000 >> /[path to folder]/logs/validateAddresses/validateAddressesCron.log
 ```
 
 ### NOTE
@@ -556,16 +565,16 @@ This is not the only measure that should be taken in order to ensure address int
 
 ## Validate Deposits
 
-The validateDeposits script audits the deposits associated with a xPub on the remote platform. It does this by requesting all deposits associated with a specific xPub and comparing the results to deposits in the wallet to insure deposits have not been corrupted or tampered with. If any inconsistencies are found details are sent via telegram and saved in the logs/validateDeposits folder. If any deposits are found missing on the platform they can be added by setting the lastBlock in the data/lastBlock-[coin].txt to below the block of the missing TX and running the watchDeposits script.
+The validateDeposits command audits the deposits associated with a xPub on the remote platform. It does this by requesting all deposits associated with a specific xPub and comparing the results to deposits in the wallet to insure deposits have not been corrupted or tampered with. If any inconsistencies are found details are sent via telegram and saved in the logs/validateDeposits folder. If any deposits are found missing on the platform they can be added by setting the lastBlock in the data/lastBlock-[coin].txt to below the block of the missing TX and running the watchDeposits command.
 
 To understand how your platforms endpoint should format the response data see the 'example-platform-api.js' file for a working example.
 
-This script can be set as cron job to validate deposits periodically.
+This command can be set as cron job to validate deposits periodically.
 
 _Example_
 
 ```
-* */1 * * * /[full path to node]/node /[path to folder]/scripts/validateDeposits.js BTC 0 1000000 >> /[path to folder]/logs/validateDeposits/validateDepositsCron.log
+* */1 * * * /[full path to node]/node /[path to folder]/cli.js validateDeposits coin=BTC startBlock=0 endBlock=1000000 >> /[path to folder]/logs/validateDeposits/validateDepositsCron.log
 ```
 
 ### NOTE
