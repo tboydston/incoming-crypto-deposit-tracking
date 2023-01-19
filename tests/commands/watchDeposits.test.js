@@ -80,7 +80,7 @@ beforeEach(() => {
 describe("Command watchDeposits tests", () => {
   test("Should throw error data path is invalid.", async () => {
     const mockRequestManager = new MockRequestManager();
-    const localConfig = structuredClone(config);
+    const localConfig = JSON.parse(JSON.stringify(config));
     localConfig.data = {};
     localConfig.data.paths = {};
     localConfig.data.paths.lastDepositBlock = "invalid/invalid";
@@ -103,7 +103,7 @@ describe("Command watchDeposits tests", () => {
       listsinceblock: validWalletTx,
       getblockchaininfo: undefined,
     });
-    const localConfig = structuredClone(config);
+    const localConfig = JSON.parse(JSON.stringify(config));
     localConfig.data = {};
     localConfig.data.paths = {};
     localConfig.data.paths.lastDepositBlock = `tests/data/lastDepositBlock-BTC.txt`;
@@ -126,7 +126,7 @@ describe("Command watchDeposits tests", () => {
       listsinceblock: { transactions: [] },
       getblockchaininfo: { blocks: 13 },
     });
-    const localConfig = structuredClone(config);
+    const localConfig = JSON.parse(JSON.stringify(config));
     localConfig.data = {};
     localConfig.data.paths = {};
     localConfig.data.paths.lastDepositBlock = `tests/data/lastDepositBlockNoNew-BTC.txt`;
@@ -149,7 +149,7 @@ describe("Command watchDeposits tests", () => {
       listsinceblock: validWalletTx,
       getblockchaininfo: { blocks: 13 },
     });
-    const localConfig = structuredClone(config);
+    const localConfig = JSON.parse(JSON.stringify(config));
     localConfig.data = {};
     localConfig.data.paths = {};
     localConfig.data.paths.lastDepositBlock = `tests/data/lastDepositBlockSuccess-BTC.txt`;
@@ -206,7 +206,7 @@ describe("Command watchDeposits tests", () => {
       listsinceblock: validWalletTx,
       getblockchaininfo: { blocks: 13 },
     });
-    const localConfig = structuredClone(config);
+    const localConfig = JSON.parse(JSON.stringify(config));
     localConfig.data = {};
     localConfig.data.paths = {};
     localConfig.data.paths.lastDepositBlock = `tests/data/lastDepositNoUpdate-BTC.txt`;
@@ -276,7 +276,7 @@ describe("Command watchDeposits tests", () => {
       },
       getblockchaininfo: { blocks: 10 },
     });
-    const localConfig = structuredClone(config);
+    const localConfig = JSON.parse(JSON.stringify(config));
     localConfig.data = {};
     localConfig.data.paths = {};
     localConfig.data.paths.lastDepositBlock = `tests/data/lastDepositBlockZeroConf-BTC.txt`;
@@ -325,7 +325,7 @@ describe("Command watchDeposits tests", () => {
       },
       getblockchaininfo: { blocks: 10 },
     });
-    const localConfig = structuredClone(config);
+    const localConfig = JSON.parse(JSON.stringify(config));
     localConfig.data = {};
     localConfig.data.paths = {};
     localConfig.data.paths.lastDepositBlock = `tests/data/lastDepositBlockZeroConf-BTC.txt`;
@@ -372,7 +372,7 @@ describe("Command watchDeposits tests", () => {
       },
       getblockchaininfo: { blocks: 11 },
     });
-    const localConfig = structuredClone(config);
+    const localConfig = JSON.parse(JSON.stringify(config));
     localConfig.data = {};
     localConfig.data.paths = {};
     localConfig.data.paths.lastDepositBlock = `tests/data/lastDepositWalletNotify-BTC.txt`;
@@ -421,7 +421,7 @@ describe("Command watchDeposits tests", () => {
       },
       getblockchaininfo: { blocks: 11 },
     });
-    const localConfig = structuredClone(config);
+    const localConfig = JSON.parse(JSON.stringify(config));
     localConfig.data = {};
     localConfig.data.paths = {};
     localConfig.data.paths.lastDepositBlock = `tests/data/lastDepositBlockNotify-BTC.txt`;
@@ -468,7 +468,7 @@ describe("Command watchDeposits tests", () => {
       },
       getblockchaininfo: { blocks: 11 },
     });
-    const localConfig = structuredClone(config);
+    const localConfig = JSON.parse(JSON.stringify(config));
     localConfig.data = {};
     localConfig.data.paths = {};
     localConfig.data.paths.lastDepositBlock = `tests/data/lastDepositNotifyNone-BTC.txt`;
