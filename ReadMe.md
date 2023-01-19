@@ -1,6 +1,6 @@
 # Incoming! Crypto Deposit Tracking
 
-Incoming! is a crypto deposit tracker for Bitcoin and Bitcoin-like( clone coins ) crypto currencies. It generates a string of deterministic addresses, adds these addresses to Bitcoind's wallet as well as to your platform and watches these address for new deposits. When a new deposit is received a notification is sent to your platform as well as to your private Telegram group.
+Incoming! is a crypto deposit tracker for Bitcoin and Bitcoin-like( clone coins ) crypto currencies. It generates a string of deterministic addresses, adds these addresses to Bitcoind's wallet, sends them securely to your platforms API, and watches these address for new deposits. When a new deposit is received a notification is sent to your platform as well as to your private Telegram group.
 
 Funds can be retrieved using any wallet that supports deterministic address generation and setting a custom [gap limit](https://support.ledger.com/hc/en-us/articles/360010892360-Address-gap-limit?docs=true) or address generation such as Electrum, Trezor( through Electrum ), and Ledger.
 
@@ -24,11 +24,15 @@ All addresses are generated using your wallets extended public key so no private
 
 ## Where to Run
 
-Incoming! can be run on any secure server that has access to Bitcoind's RPC API and your platform API. In most cases it is run on the same server that contains Bitcoind. The config file contains sensitive data including extended public keys, request signing keys, TG bot tokens, and bitcoind RPC credentials and should be properly secured. If this file is compromised the attacker will not gain control of any funds as no private keys are used but they could cause problems by submitting fake deposits or addresses and sending fake TG notifications as well as gaining access to your full address chain.
+Incoming! can be run on any secure server that has access to Bitcoind's RPC API and your platform API. In most cases it is run on the same server that contains Bitcoind. 
+
+### Security Note
+
+The config file contains sensitive data including extended public keys, request signing keys, Telegram bot tokens, and Bitcoind RPC credentials. If this file is compromised the attacker will not gain control of any funds as no private keys are used but they could cause other problems by submitting fake deposits, adding addresses not belonging to your wallet to your platform, sending fake Telegram notifications, or expose all your deposit addresses.
 
 ## What Coins Are Supported?
 
-Incoming! will theoretically work with any coin that is a clone or fork of bitcoind and has similar wallet RPC responses and supports walletnotify and blocknotify config settings. Some coins have made variations to these responses so you many need to make some minor adjustments to the script for these coins. It would be better to copy the watchDeposits script and rename it to something like 'watchDeposits-MYCOIN.js' than attempting to add a bunch of conditional statements to the Bitcoin specific watchDeposit script.
+Incoming! will theoretically work with any coin that is a clone or fork of bitcoind and has similar wallet RPC responses and supports walletnotify and blocknotify config settings. Some coins have made variations to these responses so you many need to make some minor adjustments to the command files for these coins. 
 
 ## Setup
 
@@ -50,15 +54,29 @@ _Optional Additional Security and Monitoring Steps_
 - Step 13: [Crediting deposits on your platform](#crediting-deposits)
 - Step 14: [Adjust sending wallet gap limit](#sending-funds)
 
-## Scripts
+## CLI
 
-Scripts are located in the /scripts folder and are run with node.
+Commands are run through the cli.js file in the projects root directory. 
 
 ```
-node [path to script][script] [param1] [param2] [param...]
+node cli.js <command> [option1]=[option1value] [option2]=[option2value]
 ```
 
-When running scripts from crontab or using walletnotify or blocknotify you will need to use the full path to the node executable. If crontab or bitcoind are run by a different user you should make sure node is accessible to that user and that user has write access to the 'logs' and 'data' folders.
+When running commands from crontab or using walletnotify or blocknotify you will need to use the full path to the node executable. If crontab or bitcoind are run by a different user you should make sure node is accessible to that user and that user has write access to the 'logs' and 'data' folders.
+
+## Commands
+
+### help 
+
+To see a list of all available commands run the 'help' command. To see help for a specific command follow help with the name of the command. 
+
+```
+node cli.js help
+
+//or 
+
+node cli.js help <command>
+```
 
 ### generateKeyPair
 
@@ -67,7 +85,7 @@ Generates a RSA key pair used to sign API requests to the platform. Results are 
 _Command_
 
 ```
-node generateSigningKeyPair
+node cli.js generateSigningKeyPair
 ```
 
 ### generateAddresses
