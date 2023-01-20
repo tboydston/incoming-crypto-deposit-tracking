@@ -2,10 +2,11 @@ const fs = require("fs");
 const express = require("express");
 const http = require("http");
 const bodyParser = require("body-parser");
-const sigMan = require("./lib/signatureManager");
+
 const pubKey = fs.readFileSync(`./keys/pub.pem`);
 const crypto = require("crypto");
 const HdAddGen = require("hdaddressgenerator");
+const sigMan = require("./lib/signatureManager");
 
 const serverPort = 7001;
 const nonceTolerance = 1000;
@@ -14,6 +15,7 @@ const validationTypes = ["hash", "address"];
 
 // Used to generate example responses.
 const allConfigs = require("./config");
+
 const coin = process.argv[2];
 const config = allConfigs[coin];
 if (config === undefined) {
@@ -24,7 +26,7 @@ if (config === undefined) {
 // File content example: 'module.exports = [transactions array]
 let exampleDeposits = [];
 try {
-  exampleDeposits = require("./test/exampleDeposits.js");
+  exampleDeposits = require("./test/exampleDeposits.js"); // eslint-disable-line
 } catch (e) {
   console.log(
     "No example deposit data supplied. Route validate/deposits will not work.",
@@ -35,13 +37,13 @@ try {
 (async () => {
   const app = express();
 
-  app.use(
-    bodyParser.text({
-      type: function (req) {
-        return "text";
-      },
-    })
-  );
+  // app.use(
+  //   bodyParser.text({
+  //     type(req) {
+  //       return "text";
+  //     },
+  //   })
+  // );
 
   // Validate signature on all requests.
   app.use(async (req, res, next) => {
@@ -56,13 +58,13 @@ try {
       status: "fail",
       message: "Invalid signature.",
     });
-    return;
+    return true;
   });
 
   // Validate nonce on all requests.
   app.use(async (req, res, next) => {
-    let now = Date.now();
-    let nonce = JSON.parse(req.body).nonce;
+    const now = Date.now();
+    const { nonce } = JSON.parse(req.body);
 
     if (nonce === undefined || nonce < now - nonceTolerance) {
       console.log(
@@ -72,7 +74,7 @@ try {
         status: "fail",
         message: "Invalid nonce.",
       });
-      return;
+      return true;
     }
 
     return next();
@@ -118,12 +120,12 @@ try {
     }
 
     if (
-      reqData.xPubHash == undefined ||
-      reqData.validationType == undefined ||
+      reqData.xPubHash === undefined ||
+      reqData.validationType === undefined ||
       reqData.xPubHash.length !== 64 ||
       !validationTypes.includes(reqData.validationType) ||
-      isNaN(reqData.startIndex) ||
-      isNaN(reqData.endIndex)
+      Number.isNaN(reqData.startIndex) ||
+      Number.isNaN(reqData.endIndex)
     ) {
       validRequest = false;
     }
@@ -205,10 +207,10 @@ try {
     }
 
     if (
-      reqData.xPubHash == undefined ||
+      reqData.xPubHash === undefined ||
       reqData.xPubHash.length !== 64 ||
-      isNaN(reqData.startBlock) ||
-      isNaN(reqData.endBlock)
+      Number.isNaN(reqData.startBlock) ||
+      Number.isNaN(reqData.endBlock)
     ) {
       validRequest = false;
     }
@@ -264,13 +266,13 @@ async function getAddressHash(startIndex, endIndex) {
   const addGen = HdAddGen.withExtPub(
     config.addressGen.xpub,
     coin,
-    (bip = parseInt(config.addressGen.bip))
+    parseInt(config.addressGen.bip, 10)
   );
 
-  let numberToValidate = endIndex - startIndex + 1;
+  const numberToValidate = endIndex - startIndex + 1;
   const addresses = await addGen.generate(
-    parseInt(numberToValidate),
-    parseInt(startIndex)
+    parseInt(numberToValidate, 10),
+    parseInt(startIndex, 10)
   );
 
   let validationString = "";
@@ -298,21 +300,21 @@ async function getAddresses(startIndex, endIndex) {
   const addGen = HdAddGen.withExtPub(
     config.addressGen.xpub,
     coin,
-    (bip = parseInt(config.addressGen.bip))
+    parseInt(config.addressGen.bip, 10)
   );
 
-  let numberToValidate = endIndex - startIndex + 1;
+  const numberToValidate = endIndex - startIndex + 1;
   const addresses = await addGen.generate(
-    parseInt(numberToValidate),
-    parseInt(startIndex)
+    parseInt(numberToValidate, 10),
+    parseInt(startIndex, 10)
   );
 
-  let addObj = {};
+  const addObj = {};
 
   let index = startIndex;
   addresses.forEach((address) => {
     addObj[index] = address.address;
-    index++;
+    index += 1;
   });
 
   return addObj;
@@ -327,7 +329,7 @@ async function getAddresses(startIndex, endIndex) {
  */
 async function getDeposits(startBlock, endBlock) {
   // Format wallet transactions.
-  let formDeposits = {};
+  const formDeposits = {};
 
   exampleDeposits.forEach((deposit) => {
     // Exclude deposits outside of range.
