@@ -152,7 +152,7 @@ Regenerates address chain and compares addresses to platform addresses to insure
 _Usage_
 
 ```
-node cli.js validateAddresses [coin] [validationType] [startIndex] [endIndex]
+node cli.js validateAddresses coin=[coin] validationType=[validationType] startIndex=[startIndex] endIndex=[endIndex]
 
 // Example
 node cli.js validateAddresses coin=BTC validationType=hash startIndex=0 endIndex=1000
