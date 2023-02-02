@@ -382,6 +382,7 @@ _Example Request Data_
         "block": 739527,
         "txid": "541d5beb1f5a79bcfbebfbfab0f30dcc0595e73f15c335ada78bc70197ectest"
     }]
+}
 ```
 
 ### Route: /validate/addresses
