@@ -366,7 +366,7 @@ _Example Request Data_
 ```
 {
     "coin": "BTC",
-    "chainHeight":739526
+    "chainHeight":739526,
     "txData": [{
         "xPubHash": "93f50d6676288093c9f58bec4e57fd65aa12ae70ccd961039dec0ebb080a9868",
         "address": "bc1q46y8dujhsy4wl52m4xlkdarp6uvlj280rktest",
