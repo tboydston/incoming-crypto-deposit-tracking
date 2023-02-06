@@ -35,7 +35,7 @@ const commands = {
   const { command, options, config, requestManager, logManager } = initResult;
 
   try {
-    commands[command](options, config, requestManager, logManager);
+    await commands[command](options, config, requestManager, logManager);
   } catch (e) {
     logManager.log(e.message, e.logToConsole, e.sendToTg);
   }
