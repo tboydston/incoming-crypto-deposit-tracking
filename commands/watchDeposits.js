@@ -25,9 +25,11 @@ module.exports = async (options, config, requestManager, logManager) => {
   let noteNumber = 1;
 
   // Check if default file path is overridden.
-  if (config.data.paths.lastDepositBlock !== undefined) {
-    dataPath = config.data.paths.lastDepositBlock;
-  }
+  try {
+    if (config.data.paths.lastDepositBlock !== undefined) {
+      dataPath = config.data.paths.lastDepositBlock;
+    }
+  } catch (e) {} // eslint-disable-line
 
   // Read file containing last block to determine which block we should look for new deposits from.
   try {

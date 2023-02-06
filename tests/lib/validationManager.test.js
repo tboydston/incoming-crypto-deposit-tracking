@@ -70,7 +70,7 @@ describe("Library validationManager tests", () => {
 
       expect(async () => {
         await validate.options("generateAddresses", args);
-      }).rejects.toThrowError("Required option coin not set.");
+      }).rejects.toThrowError("Required option 'coin' not set.");
     });
     test("Should set 'mode' to default value 'show' because no value is set.", async () => {
       const args = ["", "", "", "coin=BTC", "startIndex=1", "endIndex=100"];

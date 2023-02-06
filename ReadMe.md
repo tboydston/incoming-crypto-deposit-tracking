@@ -275,6 +275,23 @@ This guide assumes that you are running Incoming! on the same server as Bitcoind
 
 Make sure to change the default username and password.
 
+## Creating your bitcoind wallet
+
+Before you can generate addresses you will need to create a empty wallet with descriptors disabled.
+
+```
+
+curl --user [username]:[password] --data-binary '{"jsonrpc": "1.0", "id": "addwallet", "method": "createwallet", "params": {"wallet_name":"incoming","descriptors":false,"load_on_startup":true,"disable_private_keys":true}}' -H 'content-type: text/plain;' http://127.0.0.1:8332/
+
+#OR
+
+bitcoin-cli -rpcuser=[username] -rpcpassword=[password] -rpcport=8332 createwallet "incoming" false true true
+
+
+```
+
+Incoming! expects only one wallet to be loaded. If are multiple wallets loaded bitcoind will throw a `{"code":-19,"message":"Wallet file not specified (must request wallet RPC through /wallet/<filename> uri-path)."}` error because the RPC request is not considering the /wallet/ url.
+
 ## Configuring your Platform API
 
 A functioning example endpoint is provided and may be used as a reference. To run it add the following values to your config.js file.

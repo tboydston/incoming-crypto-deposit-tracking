@@ -65,7 +65,11 @@ module.exports = async (options, config, requestManager, logManager) => {
     try {
       await requestManager.rpc("importmulti", [rpcFormatted]);
     } catch (e) {
-      logManager.log(`RPC server error. Raw Error: ${e.message}`);
+      logManager.log(
+        `RPC server error. Error Message: ${
+          e.message
+        } Error Data: ${JSON.stringify(e.response.data)}`
+      );
     }
   }
 
@@ -76,7 +80,7 @@ module.exports = async (options, config, requestManager, logManager) => {
         remoteFormatted
       );
     } catch (e) {
-      logManager.log(`Remote server error. Raw Error: ${e.message}`);
+      logManager.log(`Remote server error. Error Message: ${e.message}`);
     }
   }
 };
