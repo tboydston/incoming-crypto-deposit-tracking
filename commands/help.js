@@ -34,7 +34,13 @@ module.exports = async (command) => {
     console.log(`\nOptions \n`);
 
     validation.required.forEach((option) => {
-      console.log(`${option}  -  ${validations.description[option]}`);
+      let optionMsg = `${option}  -  ${validations.description[option]} `;
+
+      if (Array.isArray(validations.types[option])) {
+        optionMsg += `Options: ${validations.types[option].join(", ")}`;
+      }
+
+      console.log(optionMsg);
     });
   }
 

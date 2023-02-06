@@ -1,4 +1,4 @@
-config = {
+const config = {
   BTC: {
     addressGen: {
       // Xpub and BIP used to generate your deterministic deposit addresses.
