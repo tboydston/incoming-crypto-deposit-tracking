@@ -33,6 +33,12 @@ module.exports = async (options, config, requestManager, logManager) => {
 
   // Read file containing last block to determine which block we should look for new deposits from.
   try {
+    if (!fs.existsSync(dataPath)) {
+      logManager.log(
+        `Last block data file does not exists at ${dataPath}. Attempting to create it.`
+      );
+      fs.writeFileSync(dataPath, "0");
+    }
     data.lastDepositBlock = fs.readFileSync(dataPath).toString();
   } catch (e) {
     throw new LogError(
