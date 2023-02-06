@@ -181,9 +181,7 @@ module.exports = async (options, config, requestManager, logManager) => {
     );
   } catch (e) {
     throw new LogError(
-      `Error sending deposits to platform for TXID: ${JSON.stringify(
-        txData
-      )} . Confirm platform API is operating. Error Message: ${e.message}`,
+      `Error sending new deposits data to platform. Confirm platform API is operating. Error Message: ${e.message}`,
       true,
       true
     );
