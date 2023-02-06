@@ -181,7 +181,9 @@ module.exports = async (options, config, requestManager, logManager) => {
     );
   } catch (e) {
     throw new LogError(
-      `Error sending deposits to platform for TXID: ${txData.txid} . Confirm platform API is operating. Raw Error: ${e.message}`,
+      `Error sending deposits to platform for TXID: ${JSON.stringify(
+        txData
+      )} . Confirm platform API is operating. Error Message: ${e.message}`,
       true,
       true
     );
@@ -198,7 +200,7 @@ module.exports = async (options, config, requestManager, logManager) => {
       );
     } catch (e) {
       throw new LogError(
-        `Error writing last deposit block. Check to make sure disk is not full. Raw Error: ${e.message}`,
+        `Error writing last deposit block. Check to make sure disk is not full. Error Message: ${e.message}`,
         true,
         true
       );
