@@ -131,11 +131,11 @@ node cli.js watchDeposits coin=BTC
 
 - _coin:_ Name of the coin as set in the config file. Example: BTC
 - _method( optional ):_ Method used to call watchDeposits script. Defines whether notifications should be sent to Telegram.
-- _cli( default ):_ Accessed via cli. New deposit notifications will be sent according to config policy.
-- _silent:_ Accessed via cli. New deposits will only be displayed in console.
-- _blockNotify:_ Accessed via bitcoind through blockNotify. New deposit notifications will be sent according to config policy.
-- _walletNotify:_ Accessed via bitcoind through walletNotify. New deposit notifications will be sent according to config policy.
-- _notifyAll:_ Accessed via cli. ALL new deposits will be sent to Telegram. WARNING: If there are too many deposits, notification message may exceed Telegram's max message length."
+	- _cli( default ):_ Accessed via cli. New deposit notifications will be sent according to config policy.
+	- _silent:_ Accessed via cli. New deposits will only be displayed in console.
+	- _blockNotify:_ Accessed via bitcoind through blockNotify. New deposit notifications will be sent according to config policy.
+	- _walletNotify:_ Accessed via bitcoind through walletNotify. New deposit notifications will be sent according to config policy.
+	- _notifyAll:_ Accessed via cli. ALL new deposits will be sent to Telegram. WARNING: If there are too many deposits, notification message may exceed Telegram's max message length."
 
 ### Command: monitorChain
 
