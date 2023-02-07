@@ -25,9 +25,9 @@ beforeEach(() => {
 });
 
 beforeAll(() => {
-  fs.writeFileSync(`tests/data/lastBlockValid-BTC.txt`, `10:${Date.now()}`);
-  fs.writeFileSync(`tests/data/lastBlockValid-2-BTC.txt`, `10:${Date.now()}`);
-  fs.writeFileSync(`tests/data/lastBlockOld-BTC.txt`, `10:100`);
+  fs.writeFileSync(`./tests/data/lastBlockValid-BTC.txt`, `10:${Date.now()}`);
+  fs.writeFileSync(`./tests/data/lastBlockValid-2-BTC.txt`, `10:${Date.now()}`);
+  fs.writeFileSync(`./tests/data/lastBlockOld-BTC.txt`, `10:100`);
 });
 
 describe("Command monitorChain tests", () => {

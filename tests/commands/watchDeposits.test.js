@@ -63,14 +63,14 @@ beforeAll(() => {
   config.keys = {};
   config.keys.pub = fs.readFileSync(`tests/keys/pub.pem`);
   config.keys.priv = fs.readFileSync(`tests/keys/priv.key`);
-  fs.writeFileSync(`tests/data/lastDepositBlock-BTC.txt`, `0`);
-  fs.writeFileSync(`tests/data/lastDepositBlockSuccess-BTC.txt`, `0`);
-  fs.writeFileSync(`tests/data/lastDepositBlockNoNew-BTC.txt`, `12`);
-  fs.writeFileSync(`tests/data/lastDepositBlockZeroConf-BTC.txt`, `0`);
-  fs.writeFileSync(`tests/data/lastDepositWalletNotify-BTC.txt`, `0`);
-  fs.writeFileSync(`tests/data/lastDepositBlockNotify-BTC.txt`, `0`);
-  fs.writeFileSync(`tests/data/lastDepositNoUpdate-BTC.txt`, `0`);
-  fs.writeFileSync(`tests/data/lastDepositNotifyNone-BTC.txt`, `0`);
+  fs.writeFileSync(`./tests/data/lastDepositBlock-BTC.txt`, `0`);
+  fs.writeFileSync(`./tests/data/lastDepositBlockSuccess-BTC.txt`, `0`);
+  fs.writeFileSync(`./tests/data/lastDepositBlockNoNew-BTC.txt`, `12`);
+  fs.writeFileSync(`./tests/data/lastDepositBlockZeroConf-BTC.txt`, `0`);
+  fs.writeFileSync(`./tests/data/lastDepositWalletNotify-BTC.txt`, `0`);
+  fs.writeFileSync(`./tests/data/lastDepositBlockNotify-BTC.txt`, `0`);
+  fs.writeFileSync(`./tests/data/lastDepositNoUpdate-BTC.txt`, `0`);
+  fs.writeFileSync(`./tests/data/lastDepositNotifyNone-BTC.txt`, `0`);
 });
 
 beforeEach(() => {
