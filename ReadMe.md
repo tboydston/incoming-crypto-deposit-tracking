@@ -533,8 +533,8 @@ Treat the 'priv.key' as a critical secret. If compromised it could be used to se
 Open your bitcoin.conf and add the following settings.
 
 ```
-walletnotify=node /[PATH TO Incoming!]/cli.js watchDeposits.js coin=BTC method=walletNotify
-blocknotify=node /[PATH TO Incoming!]/cli.js watchDeposits.js coin=BTC method=blockNotify
+walletnotify=node /[PATH TO Incoming!]/cli.js watchDeposits coin=BTC method=walletNotify
+blocknotify=node /[PATH TO Incoming!]/cli.js watchDeposits coin=BTC method=blockNotify
 
 ```
 
