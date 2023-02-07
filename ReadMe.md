@@ -131,11 +131,11 @@ node cli.js watchDeposits coin=BTC
 
 - _coin:_ Name of the coin as set in the config file. Example: BTC
 - _method( optional ):_ Method used to call watchDeposits script. Defines whether notifications should be sent to Telegram.
-	- _cli( default ):_ Accessed via cli. New deposit notifications will be sent according to config policy.
-	- _silent:_ Accessed via cli. New deposits will only be displayed in console.
-	- _blockNotify:_ Accessed via bitcoind through blockNotify. New deposit notifications will be sent according to config policy.
-	- _walletNotify:_ Accessed via bitcoind through walletNotify. New deposit notifications will be sent according to config policy.
-	- _notifyAll:_ Accessed via cli. ALL new deposits will be sent to Telegram. WARNING: If there are too many deposits, notification message may exceed Telegram's max message length."
+  - _cli( default ):_ Accessed via cli. New deposit notifications will be sent according to config policy.
+  - _silent:_ Accessed via cli. New deposits will only be displayed in console.
+  - _blockNotify:_ Accessed via bitcoind through blockNotify. New deposit notifications will be sent according to config policy.
+  - _walletNotify:_ Accessed via bitcoind through walletNotify. New deposit notifications will be sent according to config policy.
+  - _notifyAll:_ Accessed via cli. ALL new deposits will be sent to Telegram. WARNING: If there are too many deposits, notification message may exceed Telegram's max message length."
 
 ### Command: monitorChain
 
@@ -382,7 +382,7 @@ _Example Request Data_
 
 ### Route: /deposit
 
-Receives an array of deposits. The same deposits may be will be sent more then once as new confirmations are received. Txid and address act as a shared key and you should never have duplicate records with the same txid and address. Incoming! will keep sending updates on a deposit as new blocks come in until the number of confirmations reaches the 'notifications.notifyUntil' value. Each time you receive a new update you should update the number of confirmations for that deposit record in the DB.
+Receives an array of deposits. The same deposits may be will be sent more then once as new confirmations are received. Txid and address act as a shared key and you should never have duplicate records with the same txid and address. Incoming! will keep sending updates on a deposit as new blocks come in until the number of confirmations reaches the 'notifications.notifyUntil' value which should be set at or above the value you consider the transaction immutable. Each time you receive a new update you should update the number of confirmations for that deposit record in the DB.
 
 _Example Request Data_
 

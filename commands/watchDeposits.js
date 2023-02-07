@@ -106,6 +106,24 @@ module.exports = async (options, config, requestManager, logManager) => {
   }
 
   if (txs.length === 0) {
+    try {
+      await requestManager.post(config.platform.routes.deposits, {
+        coin,
+        chainHeight,
+        txData,
+      });
+      logManager.log(
+        `Notified platform of new block. Chain Height: ${chainHeight}`,
+        true,
+        false
+      );
+    } catch (e) {
+      throw new LogError(
+        `Error sending new chain height data to platform. Confirm platform API is operating. Error Message: ${e.message}`,
+        true,
+        true
+      );
+    }
     throw new LogError(
       `No new transactions since block ${data.lastDepositBlock}`
     );
