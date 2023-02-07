@@ -127,11 +127,14 @@ module.exports = async (options, config, requestManager, logManager) => {
 
     // Build Telegram notification.
     if (
-      config.notifications.notifyTgOnConfirmations.includes(tx.confirmations) &&
-      ((method === "walletNotify" && tx.confirmations <= 1) ||
-        (method === "blockNotify" && tx.confirmations > 1) ||
-        method === "cli") &&
-      method !== "silent"
+      (config.notifications.notifyTgOnConfirmations.includes(
+        tx.confirmations
+      ) &&
+        ((method === "walletNotify" && tx.confirmations <= 1) ||
+          (method === "blockNotify" && tx.confirmations > 1) ||
+          method === "cli") &&
+        method !== "silent") ||
+      method === "notifyAll"
     ) {
       depositString += `Deposit ${noteNumber}
         Address: [${tx.address}](${config.explorer.address}${tx.address})
