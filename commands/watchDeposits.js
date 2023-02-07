@@ -159,8 +159,8 @@ module.exports = async (options, config, requestManager, logManager) => {
   });
 
   // Send deposit data to Telegram and console.
-  if (txData.length > 0 && depositString.length !== 0) {
-    logManager.log(
+  if (txData.length > 0 && depositString !== "") {
+    await logManager.log(
       `Incoming ${coin} Deposit\\(s\\): \n${depositString}`,
       true,
       true
