@@ -115,7 +115,7 @@ node cli.js generateAddresses coin=BTC mode=add startIndex=0 endIndex=10000
 
 ### Command: watchDeposits
 
-Checks wallet for new deposits or updates on deposits within confirmations less then or equal to the config value 'notifications.watchUntil'. Incoming deposit information is sent to the specified Telegram group and logged. The block to check for deposits from is saved in the data/lastDepositBlock-[coin].txt file. You can resubmit deposits by resetting this value to one minus the block you would like to check for deposits from.
+Checks wallet for new deposits or updates on deposits within confirmations less then or equal to the config value 'notifications.watchUntil'. Incoming deposit information is sent to the specified Telegram group and logged. The block to check for deposits from is saved in the data/lastDepositBlock-[coin].txt file. You can resubmit deposits the block you would like to check for deposits from.
 
 _Usage_
 
@@ -130,6 +130,12 @@ node cli.js watchDeposits coin=BTC
 #### Options
 
 - _coin:_ Name of the coin as set in the config file. Example: BTC
+- _method( optional ):_ Method used to call watchDeposits script. Defines whether notifications should be sent to Telegram.
+- _cli( default ):_ Accessed via cli. New deposit notifications will be sent according to config policy.
+- _silent:_ Accessed via cli. New deposits will only be displayed in console.
+- _blockNotify:_ Accessed via bitcoind through blockNotify. New deposit notifications will be sent according to config policy.
+- _walletNotify:_ Accessed via bitcoind through walletNotify. New deposit notifications will be sent according to config policy.
+- _notifyAll:_ Accessed via cli. ALL new deposits will be sent to Telegram. WARNING: If there are too many deposits, notification message may exceed Telegram's max message length."
 
 ### Command: monitorChain
 
