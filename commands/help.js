@@ -35,12 +35,22 @@ module.exports = async (command) => {
 
     validation.required.forEach((option) => {
       let optionMsg = `${option}  -  ${validations.description[option]} `;
-
-      if (Array.isArray(validations.types[option])) {
-        optionMsg += `Options: ${validations.types[option].join(", ")}`;
-      }
-
       console.log(optionMsg);
+      
+      if (Array.isArray(validations.types[option])) {
+        const optionValues = validations.types[option]
+        optionValues.forEach((value) => {
+          
+          let isDefault = ""
+          
+          if( validation.default[option] === value ){
+            isDefault = "( default )"
+          }
+          
+          console.log(`   ${value}${isDefault}: ${validations.description[value]}`)
+        })
+      }
+      
     });
   }
 

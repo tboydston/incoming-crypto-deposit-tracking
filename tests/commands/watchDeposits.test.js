@@ -158,7 +158,7 @@ describe("Command watchDeposits tests", () => {
       await watch(
         {
           coin: "BTC",
-          method: "notifyAll",
+          method: "cli",
         },
         localConfig,
         mockRequestManager,
@@ -217,7 +217,7 @@ describe("Command watchDeposits tests", () => {
       await watch(
         {
           coin: "BTC",
-          method: "notifyAll",
+          method: "cli",
         },
         localConfig,
         mockRequestManager,
@@ -451,7 +451,7 @@ describe("Command watchDeposits tests", () => {
       ).toBe("0");
     }).not.toThrowError();
   });
-  test("Should NOT send notification to Telegram when method is 'notifyNone'", async () => {
+  test("Should NOT send notification to Telegram when method is 'silent'", async () => {
     const mockRequestManager = new MockRequestManager({
       getblockhash: "validBlockHash",
       listsinceblock: {
