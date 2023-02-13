@@ -1,6 +1,5 @@
 const crypto = require("crypto");
 const HdAddGen = require("hdaddressgenerator");
-const LogError = require("../lib/LogError");
 
 /**
  * Generate deterministic addresses and add them to a local Bitcoind like wallet and remote platform API.
@@ -11,6 +10,7 @@ module.exports = async (options, config, requestManager, logManager) => {
   const { startIndex } = options;
   const { endIndex } = options;
 
+  // Init addresses generator with xpub and bip.
   const addGen = HdAddGen.withExtPub(
     config.addressGen.xpub,
     coin,
@@ -19,6 +19,7 @@ module.exports = async (options, config, requestManager, logManager) => {
 
   const numberToGenerate = endIndex - startIndex + 1;
 
+  // Generate addresses from start index to end index.
   const addresses = await addGen.generate(
     parseInt(numberToGenerate, 10),
     parseInt(startIndex, 10)
@@ -35,6 +36,7 @@ module.exports = async (options, config, requestManager, logManager) => {
     .update(config.addressGen.xpub)
     .digest("hex");
 
+  // Build requests to bitcoind, platform, and display output to console.
   let index = startIndex;
   addresses.forEach((address) => {
     logManager.log(
@@ -61,6 +63,7 @@ module.exports = async (options, config, requestManager, logManager) => {
     index += 1;
   });
 
+  // Send results to bitcoind or remote platform depending on selected mode.
   if (["walletOnly", "add"].includes(mode)) {
     try {
       await requestManager.rpc("importmulti", [rpcFormatted]);

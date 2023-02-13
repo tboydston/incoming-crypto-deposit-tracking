@@ -1,64 +1,60 @@
+const fs = require("fs");
+const RequestManager = require("../lib/RequestManager");
+const allConfigs = require("../config");
 
-const fs = require('fs')
-const RequestManager = require('../lib/RequestManager')
-const allConfigs = require('../config')
-const coin = process.argv[2]
-const config = allConfigs[coin]
+const coin = process.argv[2];
+const config = allConfigs[coin];
 
-;(async()=>{
+(async () => {
+  try {
+    config.keys = {};
+    config.keys.pub = fs.readFileSync(`./keys/${config.pubKey}`);
+    config.keys.priv = fs.readFileSync(`./keys/${config.privKey}`);
+  } catch (e) {
+    console.error(`Error loading signing keys. Raw Error: ${e.message}`);
+    process.exit();
+  }
 
-    try {
-        config.keys = {}
-        config.keys.pub = fs.readFileSync(`./keys/${config.pubKey}`)
-        config.keys.priv = fs.readFileSync(`./keys/${config.privKey}`)
+  let requestManager = {};
 
-    } catch (e){
-        console.error(`Error loading signing keys. Raw Error: ${e.message}`)
-        process.exit()
-    }
+  try {
+    requestManager = new RequestManager(
+      config.remoteAddress,
+      config.remotePort,
+      config.rpcAddress,
+      config.rpcPort,
+      config.rpcUser,
+      config.rpcPass,
+      config.keys.priv,
+      config.keys.pub
+    );
+  } catch (e) {
+    console.error(`Error loading request manager. Raw Error: ${e.message}`);
+    process.exit();
+  }
 
-    let requestManager = {}
+  let rpcResponse = {};
 
-    try {
+  try {
+    rpcResponse = await requestManager.rpc("getblockchaininfo", []);
+  } catch (e) {
+    console.error(`RPC server error. Raw Error: ${e.message}`);
+  }
 
-        requestManager = new RequestManager(
-            config.remoteAddress,
-            config.remotePort,
-            config.rpcAddress,
-            config.rpcPort,
-            config.rpcUser,
-            config.rpcPass,
-            config.keys.priv,
-            config.keys.pub
-        )
+  let remoteResponse = {};
 
-    } catch(e) {
-        console.error(`Error loading request manager. Raw Error: ${e.message}`)
-        process.exit()
-    }
+  try {
+    remoteResponse = await requestManager.post(config.remoteRouteAddresses, {
+      msg: "ping",
+    });
+  } catch (e) {
+    console.error(`Remote server error. Raw Error: ${e.message}`);
+  }
 
-    let rpcResponse = {}
-
-    try {
-        rpcResponse = await requestManager.rpc("getblockchaininfo",[])    
-    } catch(e) {
-        console.error(`RPC server error. Raw Error: ${e.message}`)
-    }
-
-    let remoteResponse = {}
-     
-    try {
-        remoteResponse = await requestManager.post(config.remoteRouteAddresses,{msg:"ping"})    
-    } catch(e) {
-        console.error(`Remote server error. Raw Error: ${e.message}`)
-    }
-
-    console.log(
-        'RPC Response',
-        rpcResponse.data,
-        'Remote Platform Response',
-        remoteResponse.data
-    )
-
+  console.log(
+    "RPC Response",
+    rpcResponse.data,
+    "Remote Platform Response",
+    remoteResponse.data
+  );
 })();
-

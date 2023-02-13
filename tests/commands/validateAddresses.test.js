@@ -8,20 +8,20 @@ const configs = require("../configTest");
 const config = configs.BTC;
 
 const addressesString = `0,bc1qs40f5r7gd675n9g9ahu054emds3nwdn0mhctvu,1,bc1qlu5lj3gfrx7ewt322kd3hgna6fmsywhuaxxcrf,`;
-const addressObj = {
-  0: "bc1qs40f5r7gd675n9g9ahu054emds3nwdn0mhctvu",
-  1: "bc1qlu5lj3gfrx7ewt322kd3hgna6fmsywhuaxxcrf",
-};
+// const addressObj = {
+//   0: "bc1qs40f5r7gd675n9g9ahu054emds3nwdn0mhctvu",
+//   1: "bc1qlu5lj3gfrx7ewt322kd3hgna6fmsywhuaxxcrf",
+// };
 
-const mockRequestManager = {
-  rpc: jest.fn(),
-  post: (requestData) => {
-    if (requestData.validationType === "hash") {
-      return crypto.createHash("sha256").update(addressesString).digest("hex");
-    }
-    return addressObj;
-  },
-};
+// const mockRequestManager = {
+//   rpc: jest.fn(),
+//   post: (requestData) => {
+//     if (requestData.validationType === "hash") {
+//       return crypto.createHash("sha256").update(addressesString).digest("hex");
+//     }
+//     return addressObj;
+//   },
+// };
 
 const mockLogManager = {
   log: jest.fn(),

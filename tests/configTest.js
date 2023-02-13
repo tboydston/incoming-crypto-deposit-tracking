@@ -32,11 +32,7 @@ const config = {
     },
     notifications: {
       notifyTgOnConfirmations: [0, 1], // Send notification to Telegram on specified confirmations numbers.
-      //notifyPlatformUntil:2
-      //unconfirmed: true, // Send a Telegram notification when their is a new unconfirmed transaction.
-      //confirm: true, // Send a Telegram notification when their is a new confirmed transaction.
       watchUntil: 2, // Update the platform on a deposit until X confirmations.
-      //when: 0, // Not when a certain number of confirmations is reached. Can't be greater than watchConfirmations.
       telegram: {
         token: "2342342:tgtoken",
         chatId: "-23423423",

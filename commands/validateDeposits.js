@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 
-const LogError = require("../lib/LogError");
+const LogMessage = require("../lib/LogMessage");
 
 module.exports = async (options, config, requestManager) => {
   const { coin } = options;
@@ -31,7 +31,7 @@ module.exports = async (options, config, requestManager) => {
     );
     platformTxs = platformResponse.data.data.deposits;
   } catch (e) {
-    throw new LogError(
+    throw new LogMessage(
       `Platform server error. Raw Error: ${e.message}`,
       true,
       true
@@ -54,7 +54,11 @@ module.exports = async (options, config, requestManager) => {
       );
     }
   } catch (e) {
-    throw new LogError(`RPC server error. Raw Error: ${e.message}`, true, true);
+    throw new LogMessage(
+      `RPC server error. Raw Error: ${e.message}`,
+      true,
+      true
+    );
   }
 
   // Request transactions since last confirmed deposit.
@@ -77,7 +81,11 @@ module.exports = async (options, config, requestManager) => {
       );
     }
   } catch (e) {
-    throw new LogError(`RPC server error. Raw Error: ${e.message}`, true, true);
+    throw new LogMessage(
+      `RPC server error. Raw Error: ${e.message}`,
+      true,
+      true
+    );
   }
 
   const walletTxs = walletResponse.data.result.transactions;
@@ -148,13 +156,13 @@ module.exports = async (options, config, requestManager) => {
   });
 
   if (inconsistencies.length > 0) {
-    throw new LogError(
+    throw new LogMessage(
       `FAIL - Validation of Deposits: ${coin} deposit inconsistencies found for block range ${startBlock} to ${endBlock}. Inconsistencies: ${inconsistencies}`,
       true,
       true
     );
   } else {
-    throw new LogError(
+    throw new LogMessage(
       `SUCCESS - Validation of Deposits: Platform ${coin} deposits match wallet for range ${startBlock} to ${endBlock}.`,
       true,
       false

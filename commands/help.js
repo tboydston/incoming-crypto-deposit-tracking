@@ -34,23 +34,23 @@ module.exports = async (command) => {
     console.log(`\nOptions \n`);
 
     validation.required.forEach((option) => {
-      let optionMsg = `${option}  -  ${validations.description[option]} `;
+      const optionMsg = `${option}  -  ${validations.description[option]} `;
       console.log(optionMsg);
-      
+
       if (Array.isArray(validations.types[option])) {
-        const optionValues = validations.types[option]
+        const optionValues = validations.types[option];
         optionValues.forEach((value) => {
-          
-          let isDefault = ""
-          
-          if( validation.default[option] === value ){
-            isDefault = "( default )"
+          let isDefault = "";
+
+          if (validation.default[option] === value) {
+            isDefault = "( default )";
           }
-          
-          console.log(`   ${value}${isDefault}: ${validations.description[value]}`)
-        })
+
+          console.log(
+            `   ${value}${isDefault}: ${validations.description[value]}`
+          );
+        });
       }
-      
     });
   }
 

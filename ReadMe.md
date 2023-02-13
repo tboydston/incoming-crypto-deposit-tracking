@@ -1,3 +1,5 @@
+[logo]: https://tboydston.github.io/incoming-demo-frontend/img/incoming-logo-full.svg "Incoming! Logo"
+
 # Incoming! Crypto Deposit Tracking
 
 Incoming! is a crypto deposit tracker for Bitcoin and Bitcoin-like( clone coins ) crypto currencies. It generates a string of deterministic addresses, adds these addresses to Bitcoind's wallet, sends them securely to your platforms API, and watches these address for new deposits. When a new deposit is received a notification is sent to your platform as well as to your private Telegram group.

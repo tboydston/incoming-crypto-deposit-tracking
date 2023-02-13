@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const fs = require("fs");
 
-const LogError = require("../lib/LogError");
+const LogMessage = require("../lib/LogMessage");
 
 /*
  *   Compares wallet deposits with deposits on the platform. Inconsistencies will be logged and sent to Telegram directly.
@@ -41,7 +41,7 @@ module.exports = async (options, config, requestManager, logManager) => {
     }
     data.lastDepositBlock = fs.readFileSync(dataPath).toString();
   } catch (e) {
-    throw new LogError(
+    throw new LogMessage(
       `Error loading last block file. Raw Error: ${e.message}`,
       true,
       true
@@ -56,7 +56,7 @@ module.exports = async (options, config, requestManager, logManager) => {
     }
     chainHeight = chainInfo.data.result.blocks;
   } catch (e) {
-    throw new LogError(
+    throw new LogMessage(
       `RPC getblockchaininfo error. Raw Error: ${e.message}`,
       true,
       true
@@ -76,7 +76,7 @@ module.exports = async (options, config, requestManager, logManager) => {
     }
     data.lastHash = hashResponse.data.result;
   } catch (e) {
-    throw new LogError(
+    throw new LogMessage(
       `RPC getblockhash error. Raw Error: ${e.message}`,
       true,
       true
@@ -98,7 +98,7 @@ module.exports = async (options, config, requestManager, logManager) => {
     }
     txs = txResponse.data.result.transactions;
   } catch (e) {
-    throw new LogError(
+    throw new LogMessage(
       `RPC listsinceblock error. Raw Error: ${e.message}`,
       true,
       true
@@ -118,13 +118,13 @@ module.exports = async (options, config, requestManager, logManager) => {
         false
       );
     } catch (e) {
-      throw new LogError(
+      throw new LogMessage(
         `Error sending new chain height data to platform. Confirm platform API is operating. Error Message: ${e.message}`,
         true,
         true
       );
     }
-    throw new LogError(
+    throw new LogMessage(
       `No new transactions since block ${data.lastDepositBlock}`
     );
   }
@@ -201,7 +201,7 @@ module.exports = async (options, config, requestManager, logManager) => {
       false
     );
   } catch (e) {
-    throw new LogError(
+    throw new LogMessage(
       `Error sending new deposits data to platform. Confirm platform API is operating. Error Message: ${e.message}`,
       true,
       true
@@ -218,7 +218,7 @@ module.exports = async (options, config, requestManager, logManager) => {
         false
       );
     } catch (e) {
-      throw new LogError(
+      throw new LogMessage(
         `Error writing last deposit block. Check to make sure disk is not full. Error Message: ${e.message}`,
         true,
         true

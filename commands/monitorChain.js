@@ -1,5 +1,5 @@
 const fs = require("fs");
-const LogError = require("../lib/LogError");
+const LogMessage = require("../lib/LogMessage");
 
 /**
  * Designed to be run periodically via crontab. Confirms RPC api's are functional and blocks are updating
@@ -14,7 +14,7 @@ module.exports = async (options, config, requestManager, logManager) => {
 
   // Check to make sure monitoring is enabled for this coin.
   if (config.chainMonitoring.enabled !== true) {
-    throw new LogError(`Monitoring disabled for ${coin}`);
+    throw new LogMessage(`Monitoring disabled for ${coin}`);
   }
 
   // Check if default file path is overridden.
@@ -29,7 +29,7 @@ module.exports = async (options, config, requestManager, logManager) => {
       fs.writeFileSync(dataPath, "0:0");
     }
   } catch (e) {
-    throw new LogError(
+    throw new LogMessage(
       `Error reading, checking, or creating last block file. Raw Error: ${e.message}`,
       true,
       true
@@ -50,7 +50,7 @@ module.exports = async (options, config, requestManager, logManager) => {
       );
     }
   } catch (e) {
-    throw new LogError(
+    throw new LogMessage(
       `Error loading last block. Raw Error: ${e.message}`,
       true,
       true
@@ -61,14 +61,18 @@ module.exports = async (options, config, requestManager, logManager) => {
   try {
     hashResponse = await requestManager.rpc("getblockcount");
   } catch (e) {
-    throw new LogError(`RPC server error. Raw Error: ${e.message}`, true, true);
+    throw new LogMessage(
+      `RPC server error. Raw Error: ${e.message}`,
+      true,
+      true
+    );
   }
 
   if (
     hashResponse.data.result === undefined ||
     hashResponse.data.error != null
   ) {
-    throw new LogError(
+    throw new LogMessage(
       `RPC getblockcount malformed. Raw Response: ${JSON.stringify(
         hashResponse.data
       )}`,
@@ -88,7 +92,7 @@ module.exports = async (options, config, requestManager, logManager) => {
     newHighestBlock <= data.lastBlock &&
     data.lastBlockScanTime < now - config.chainMonitoring.expectBlockPeriod
   ) {
-    throw new LogError(
+    throw new LogMessage(
       `${coin} chain has not updated in over ${checkDurationMin} minute\\(s\\). Exceeding warning threshold of ${warningThreshold} minute\\(s\\). No notification sent.`,
       true,
       true
@@ -97,7 +101,7 @@ module.exports = async (options, config, requestManager, logManager) => {
 
   // If the block number has not been changed but time between blocks is still less than the expected block period we log that we scanned but don't notify TG.
   if (newHighestBlock <= data.lastBlock) {
-    throw new LogError(
+    throw new LogMessage(
       `${coin} chain has not updated in over ${checkDurationMin} minute\\(s\\). Within warning threshold of ${warningThreshold} minute\\(s\\). No notification sent.`,
       true,
       false
@@ -108,14 +112,14 @@ module.exports = async (options, config, requestManager, logManager) => {
   try {
     fs.writeFileSync(dataPath, `${newHighestBlock.toString()}:${now}`);
   } catch (e) {
-    throw new LogError(
+    throw new LogMessage(
       `Error writing last block. Check to make sure disk is not full. Raw Error: ${e.message}`,
       true,
       true
     );
   }
 
-  throw new LogError(
+  throw new LogMessage(
     `New ${coin} block: ${newHighestBlock.toString()}`,
     true,
     false

@@ -1,7 +1,7 @@
 const HdAddGen = require("hdaddressgenerator");
 const crypto = require("crypto");
 
-const LogError = require("../lib/LogError");
+const LogMessage = require("../lib/LogMessage");
 
 /*
  *   Regenerates address chain and compares addresses to platform addresses to insure that platform addresses have not been tampered with. Inconsistencies will be logged and sent to Telegram directly.
@@ -45,7 +45,7 @@ module.exports = async (options, config, requestManager) => {
     );
     responseData = remoteResponse.data.data;
   } catch (e) {
-    throw new LogError(
+    throw new LogMessage(
       `Remote platform server error. Raw Error: ${e.message}`,
       true,
       true
@@ -55,7 +55,7 @@ module.exports = async (options, config, requestManager) => {
   // If validation type is hash compare locally generated hash to platform addresses to look for inconsistencies.
   if (validationType === "hash") {
     if (responseData.hash === undefined || responseData.hash.length !== 64) {
-      throw new LogError(
+      throw new LogMessage(
         `Remote platform request malformed. Expected hash got: ${JSON.stringify(
           responseData
         )}`,
@@ -76,13 +76,13 @@ module.exports = async (options, config, requestManager) => {
       .digest("hex");
 
     if (validationHash !== responseData.hash) {
-      throw new LogError(
+      throw new LogMessage(
         `FAIL - Validation of Addresses by Hash: Platform ${coin} addresses for index range ${startIndex} to ${endIndex} do not match local addresses when compared by hash. Expected hash ${validationHash} received hash ${responseData.hash} . Run address by address comparison to find inconsistencies.`,
         true,
         true
       );
     } else {
-      throw new LogError(
+      throw new LogMessage(
         `SUCCESS - Validation of Addresses by Hash: Platform ${coin} deposit addresses match deterministic addresses for range ${startIndex} to ${endIndex} when compared by hash`,
         true,
         false
@@ -96,7 +96,7 @@ module.exports = async (options, config, requestManager) => {
       responseData.addresses === undefined ||
       typeof responseData.addresses !== "object"
     ) {
-      throw new LogError(
+      throw new LogMessage(
         `Remote platform request malformed. Expected object of addresses and index ( Example: {addresses:{index1:address1,index2:address2}} ) got: ${JSON.stringify(
           responseData
         )}`,
@@ -126,13 +126,13 @@ module.exports = async (options, config, requestManager) => {
     }
 
     if (inconsistencies.length > 0) {
-      throw new LogError(
+      throw new LogMessage(
         `FAIL - Validation of Addresses: Platform ${coin} deposit address inconsistencies found for index range ${addresses} to ${endIndex}. Inconsistencies: ${inconsistencies}`,
         true,
         true
       );
     } else {
-      throw new LogError(
+      throw new LogMessage(
         `SUCCESS - Validation of Addresses: Platform ${coin} deposit addresses match deterministic addresses for range ${startIndex} to ${endIndex} when compared by address.`,
         true,
         false
@@ -140,7 +140,7 @@ module.exports = async (options, config, requestManager) => {
     }
   }
 
-  throw new LogError(
+  throw new LogMessage(
     `Unknown address validation error. Validate Address function was run but no validation was done. Validation type: ${validationType}`,
     true,
     true
