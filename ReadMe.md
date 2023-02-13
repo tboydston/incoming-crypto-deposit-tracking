@@ -1,4 +1,5 @@
 [logo]: https://tboydston.github.io/incoming-demo-frontend/img/incoming-logo-full.svg "Incoming! Logo"
+![alt text][logo]
 
 # Incoming! Crypto Deposit Tracking
 
