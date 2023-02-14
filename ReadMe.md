@@ -128,7 +128,7 @@ node cli.js generateAddresses coin=BTC mode=add startIndex=0 endIndex=10000
 
 ### Command: watchDeposits
 
-Checks wallet for new deposits or updates on deposits within confirmations less then or equal to the config value 'notifications.watchUntil'. Incoming deposit information is sent to the specified Telegram group and logged. The block to check for deposits from is saved in the data/lastDepositBlock-[coin].txt file. You can resubmit deposits the block you would like to check for deposits from.
+Checks wallet for new deposits or updates on deposits within confirmations less then or equal to the config value 'notifications.watchUntil'. Incoming deposit information is sent to the specified Telegram group and logged. The block to check for deposits from is saved in the data/lastDepositBlock-[coin].txt file. You can resubmit deposits to the platfrom by changing the lastDepositBlock number in this file. 
 
 _Usage_
 
@@ -152,7 +152,7 @@ node cli.js watchDeposits coin=BTC
 
 ### Command: monitorChain
 
-This command can be run directly or periodically from the crontabs file. When run, the command iterates through all coins where monitoring is enabled ( config value: chainMonitoring.enabled ) and confirms their RPC api is running and that they are adding blocks. See [Monitoring Chains](#monitoring-chains) for more details.
+This command can be run directly or periodically from the crontabs file. When run, the current time is compared to the last block time. If the difference exceeds the expectedBlockPeriod set in the config file a notifications is sent to Telegram. See [Monitoring Chains](#monitoring-chains) for more details.
 
 _Usage_
 
@@ -357,7 +357,7 @@ _Example Request Body_
 {"nonce":1655348865573,"data":{REQUEST DATA OBJECT}}
 ```
 
-Incoming! is expecting the following response structure but in most cases it just checks for a '200' HTTP response.
+Incoming! is expecting the following response structure from the platform but in most cases it just checks for a '200' HTTP response.
 
 ```
 {
@@ -602,11 +602,11 @@ This is not the only measure that should be taken in order to ensure address int
 
 ## Validate Deposits
 
-The validateDeposits command audits the deposits associated with a xPub on the remote platform. It does this by requesting all deposits associated with a specific xPub and comparing the results to deposits in the wallet to insure deposits have not been corrupted or tampered with. If any inconsistencies are found details are sent via telegram and saved in the logs/validateDeposits folder. If any deposits are found missing on the platform they can be added by setting the lastBlock in the data/lastBlock-[coin].txt to below the block of the missing TX and running the watchDeposits command.
+The validateDeposits command audits the deposits associated with a xPub on the remote platform. It does this by requesting all deposits associated with a specific xPub and comparing the results to deposits in the wallet to insure deposits have not been corrupted or tampered with. If any inconsistencies are found details are sent via Telegram and saved in the logs/validateDeposits folder. If any deposits are found missing on the platform they can be added by setting the lastBlock in the data/lastBlock-[coin].txt to below the block of the missing TX and running the watchDeposits command.
 
 To understand how your platforms endpoint should format the response data see the 'example-platform-api.js' file for a working example.
 
-This command can be set as cron job to validate deposits periodically.
+This command can be set as a cron job to validate deposits periodically.
 
 _Example_
 
@@ -622,7 +622,7 @@ This is not the only measure that should be taken to insure deposit integrity. T
 
 Each chain has a different amount of confirmations that are required before a transaction may be considered immutable. For PoW chains this is generally related to the amount of hashing power required to conduct a [51% attack](https://academy.binance.com/en/articles/what-is-a-51-percent-attack) on the network. You will need to do some research about the suggested number of confirmations for each of the chains you intend to receive deposits on. This number may need to be updated if a network is under attack or if there is a significant change in hashing power available on the network that may make it stronger of more vulnerable.
 
-When implementing fund crediting on your platform you should set 'notifications.watchUntil' in the config file higher then the number of confirmations you require to credit funds. Incoming! will continue to notify your platform about a deposit until this it has received the number of confirmations specified in 'notifications.watchUntil'. You should ONLY update confirmations for a specific transaction when data about that transaction is received in the 'txData' section of the request to your platform until the number of confirmations in the 'txData' reaches the number of confirmations you require to credit the transaction. After a transaction is confirmed you can use the 'chainHeight' key sent to your deposits API with each new block to calculate how many total confirmations a transaction has received. The reason for this is that transactions in the 'txData' key of the data object are confirmed to be in the wallet. If you no longer see the transaction here and the transaction is has not received the necessary number of confirmations to become immutable it may belong to an ['orphan' or 'stale' block](https://academy.binance.com/en/glossary/orphan-block) that was created maliciously by a 51% attack or in the normal course of blockchain operation by 2 miners submitting valid blocks at the same time.
+When implementing fund crediting on your platform you should set 'notifications.watchUntil' in the config file higher then the number of confirmations you require to credit funds. Incoming! will continue to notify your platform about a deposit until it has received the number of confirmations specified in 'notifications.watchUntil'. You should ONLY update confirmations for a specific transaction when data about that transaction is received in the 'txData' section of the request to your platform until the number of confirmations in the 'txData' reaches the number of confirmations you require to credit the transaction. After a transaction is confirmed you can use the 'chainHeight' key sent to your deposits API with each new block to calculate how many total confirmations a transaction has received. The reason for this is that transactions in the 'txData' key of the data object are confirmed to be in the wallet. If you no longer see the transaction here and the transaction has not received the necessary number of confirmations to become immutable it may belong to an ['orphan' or 'stale' block](https://academy.binance.com/en/glossary/orphan-block) that was created maliciously by a 51% attack or in the normal course of blockchain operation by 2 miners submitting valid blocks at the same time.
 
 ## Sending Funds
 
@@ -636,3 +636,8 @@ Since Incoming! only tracks public keys you will need an additional wallet, pref
 ### Limits
 
 Both Electrum and Ledger require sending your addresses to their servers for tracking ( Electrum is a distributed service so 'their servers' in this context is whatever node you connect to. ). This causes 2 issues. The firsts is that it tells a 3rd party what addresses belong to you which reduces anonymity. The second is that this 3rd party is essentially offering you a free service with no guarantee of performance. So if you ask them to monitor millions of addresses you may experience performance issues or tracking failures.
+
+### Implementation Services
+
+If you would like to hire me to implement Incoming! or help develope your crypto asset management system and strategies I may be contacted at info@optimalprime.com 
+
