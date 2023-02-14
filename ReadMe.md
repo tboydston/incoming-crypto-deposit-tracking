@@ -1,4 +1,7 @@
 [logo]: https://tboydston.github.io/incoming-demo-frontend/img/incoming-logo-full.svg "Incoming! Logo"
+[workflow]: https://tboydston.github.io/incoming-demo-frontend/img/incoming-workflow.png "Incoming! Workflow"
+
+![alt text][logo]
 
 # Incoming! Crypto Deposit Tracking
 
@@ -27,6 +30,8 @@ All addresses are generated using your wallets extended public key so no private
 ## Where to Run
 
 Incoming! can be run on any secure server that has access to Bitcoind's RPC API and your platform API. In most cases it is run on the same server that contains Bitcoind.
+
+![alt text][workflow]
 
 ## What Coins Are Supported?
 
